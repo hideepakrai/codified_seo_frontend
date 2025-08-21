@@ -8,6 +8,8 @@ import AuthPage from "./Components/AuthenticationForm";
 import SEODashboard from "./Components/Dashboard";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoutes } from "./Components/ProtectedRoutes";
+import AddProjectForm from "./Components/ProjectsAdd";
+import CrawlComponent from "./Components/Crawl";
 
 const router = createBrowserRouter([
   {
@@ -23,12 +25,27 @@ const router = createBrowserRouter([
         path: "signup",
         element: <AuthPage />,
       },
-
       {
         path: "/dashboard",
         element: (
           <ProtectedRoutes>
             <SEODashboard />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/addproject",
+        element: (
+          <ProtectedRoutes>
+            <AddProjectForm />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/crawl",
+        element: (
+          <ProtectedRoutes>
+            <CrawlComponent />
           </ProtectedRoutes>
         ),
       },

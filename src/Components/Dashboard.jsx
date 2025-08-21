@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+
 import {
   Search,
   Plus,
@@ -19,100 +20,39 @@ import {
   XCircle,
   Clock,
 } from "lucide-react";
+import axios from "axios";
+import { Link } from "react-router";
 
 export default function SEODashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [projects, setProjects] = useState([]);
 
-  // Mock data for crawled websites
-  const [projects] = useState([
-    {
-      id: 1,
-      url: "https://example.com",
-      name: "Example Website",
-      status: "completed",
-      lastCrawled: "2024-08-20",
-      pagesFound: 1250,
-      errors: 3,
-      warnings: 12,
-      crawlTime: "2h 15m",
-      features: {
-        ignoreRobotsTxt: true,
-        followNofollow: false,
-        crawlSitemap: true,
-        allowSubdomains: true,
-      },
-    },
-    {
-      id: 2,
-      url: "https://techblog.com",
-      name: "Tech Blog",
-      status: "running",
-      lastCrawled: "2024-08-20",
-      pagesFound: 847,
-      errors: 0,
-      warnings: 5,
-      crawlTime: "1h 42m",
-      features: {
-        ignoreRobotsTxt: false,
-        followNofollow: true,
-        crawlSitemap: true,
-        allowSubdomains: false,
-      },
-    },
-    {
-      id: 3,
-      url: "https://ecommerce-store.com",
-      name: "E-commerce Store",
-      status: "failed",
-      lastCrawled: "2024-08-19",
-      pagesFound: 0,
-      errors: 15,
-      warnings: 0,
-      crawlTime: "0h 5m",
-      features: {
-        ignoreRobotsTxt: true,
-        followNofollow: true,
-        crawlSitemap: false,
-        allowSubdomains: true,
-      },
-    },
-    {
-      id: 4,
-      url: "https://portfolio.dev",
-      name: "Developer Portfolio",
-      status: "completed",
-      lastCrawled: "2024-08-18",
-      pagesFound: 45,
-      errors: 1,
-      warnings: 2,
-      crawlTime: "0h 8m",
-      features: {
-        ignoreRobotsTxt: false,
-        followNofollow: false,
-        crawlSitemap: true,
-        allowSubdomains: false,
-      },
-    },
-    {
-      id: 5,
-      url: "https://news-site.org",
-      name: "News Portal",
-      status: "completed",
-      lastCrawled: "2024-08-17",
-      pagesFound: 3420,
-      errors: 8,
-      warnings: 24,
-      crawlTime: "4h 32m",
-      features: {
-        ignoreRobotsTxt: true,
-        followNofollow: true,
-        crawlSitemap: true,
-        allowSubdomains: true,
-      },
-    },
-  ]);
+  useEffect(() => {
+    const fetchAllProjects = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URI}`, {
+          withCredentials: true,
+        });
+
+        if (response.data.ok) {
+          setProjects(response.data.projects);
+        }
+      } catch (error) {
+        // projets
+        setProjects([]);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllProjects();
+  }, []);
+
+  console.log(projects);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -140,11 +80,11 @@ export default function SEODashboard() {
     }
   };
 
-  const filteredProjects = projects.filter(
-    (project) =>
-      project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      project.url.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // const filteredProjects = projects.filter(
+  //   (project) =>
+  //     project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     project.url.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -181,17 +121,22 @@ export default function SEODashboard() {
           </button>
 
           {/* Add New Project Button */}
-          <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-2xl">
-            <Plus className="w-5 h-5" />
-            <span>Add New Project</span>
-          </button>
+          <Link
+            to={"/addproject"}
+            className=" space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-2xl"
+          >
+            <button className="flex items-center">
+              <Plus className="w-5 h-5" />
+              <span>Add New Project</span>
+            </button>
+          </Link>
         </div>
 
         {/* Projects Grid */}
         <div className="grid gap-6">
-          {filteredProjects.map((project) => (
+          {projects.map(({ Project, Crawl }) => (
             <div
-              key={project.id}
+              key={Project.Id}
               className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 hover:bg-white/15 transition-all cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
@@ -201,10 +146,10 @@ export default function SEODashboard() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-1">
-                      {project.name}
+                      Project #{Project.Id}
                     </h3>
                     <p className="text-gray-300 flex items-center">
-                      {project.url}
+                      {Project.URL}
                       <ExternalLink className="w-4 h-4 ml-2" />
                     </p>
                   </div>
@@ -212,19 +157,39 @@ export default function SEODashboard() {
 
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`px-3 py-1 rounded-full flex items-center space-x-2 ${getStatusColor(
-                      project.status
-                    )}`}
+                    className={`px-3 py-1 rounded-full flex items-center space-x-2 ${
+                      Project.Deleting
+                        ? "bg-red-500/20 text-red-400"
+                        : "bg-green-500/20 text-green-400"
+                    }`}
                   >
-                    {getStatusIcon(project.status)}
+                    {Project.Deleting ? (
+                      <Trash2 className="w-4 h-4" />
+                    ) : (
+                      <CheckCircle className="w-4 h-4" />
+                    )}
                     <span className="text-sm font-medium capitalize">
-                      {project.status}
+                      {Project.Deleting ? "Deleting" : "Active"}
                     </span>
                   </div>
 
-                  <button className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
+                  {Crawl.Crawling && (
+                    <Link
+                      to={`/crawl?pid=${Project.Id}&Crawling=${Crawl.Crawling}`}
+                      className="inline-flex items-center px-5 py-1  rounded-xl bg-green-700 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+                    >
+                      Crawling
+                    </Link>
+                  )}
+
+                  {!Crawl.Crawling && (
+                    <Link
+                      to={`/crawl?pid=${Project.Id}&Crawling=${Crawl.Crawling}`}
+                      className="inline-flex items-center px-5 py-1  rounded-xl bg-blue-700 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+                    >
+                      Crawl Now
+                    </Link>
+                  )}
                 </div>
               </div>
 
@@ -232,51 +197,63 @@ export default function SEODashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                 <div className="bg-black/20 rounded-xl p-3">
                   <div className="text-2xl font-bold text-white">
-                    {project.pagesFound.toLocaleString()}
+                    {Project.Host || "-"}
                   </div>
-                  <div className="text-sm text-gray-400">Pages Found</div>
-                </div>
-                <div className="bg-black/20 rounded-xl p-3">
-                  <div className="text-2xl font-bold text-red-400">
-                    {project.errors}
-                  </div>
-                  <div className="text-sm text-gray-400">Errors</div>
+                  <div className="text-sm text-gray-400">Host</div>
                 </div>
                 <div className="bg-black/20 rounded-xl p-3">
                   <div className="text-2xl font-bold text-yellow-400">
-                    {project.warnings}
+                    {Project.UserAgent.length > 15
+                      ? Project.UserAgent.slice(0, 15) + "..."
+                      : Project.UserAgent}
                   </div>
-                  <div className="text-sm text-gray-400">Warnings</div>
+                  <div className="text-sm text-gray-400">User Agent</div>
                 </div>
                 <div className="bg-black/20 rounded-xl p-3">
                   <div className="text-2xl font-bold text-blue-400">
-                    {project.crawlTime}
+                    {new Date(Project.Created).toLocaleDateString()}
                   </div>
-                  <div className="text-sm text-gray-400">Crawl Time</div>
+                  <div className="text-sm text-gray-400">Created</div>
+                </div>
+                <div className="bg-black/20 rounded-xl p-3">
+                  <div className="text-2xl font-bold text-green-400">
+                    {Project.BasicAuth ? "Yes" : "No"}
+                  </div>
+                  <div className="text-sm text-gray-400">Basic Auth</div>
                 </div>
               </div>
 
               {/* Features & Actions */}
               <div className="flex items-center justify-between">
                 <div className="flex flex-wrap gap-2">
-                  {project.features.ignoreRobotsTxt && (
+                  {Project.IgnoreRobotsTxt && (
                     <span className="px-2 py-1 bg-purple-600/20 text-purple-300 rounded-md text-xs">
                       Ignore Robots.txt
                     </span>
                   )}
-                  {project.features.followNofollow && (
+                  {Project.FollowNofollow && (
                     <span className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded-md text-xs">
                       Follow Nofollow
                     </span>
                   )}
-                  {project.features.crawlSitemap && (
+                  {Project.CrawlSitemap && (
                     <span className="px-2 py-1 bg-green-600/20 text-green-300 rounded-md text-xs">
                       Crawl Sitemap
                     </span>
                   )}
-                  {project.features.allowSubdomains && (
+                  {Project.AllowSubdomains && (
                     <span className="px-2 py-1 bg-pink-600/20 text-pink-300 rounded-md text-xs">
                       Allow Subdomains
+                    </span>
+                  )}
+                  {Project.CheckExternalLinks && (
+                    <span className="px-2 py-1 bg-orange-600/20 text-orange-300 rounded-md text-xs">
+                      Check External Links
+                    </span>
+                  )}
+                  {Project.Archive && (
+                    <span className="px-2 py-1 bg-yellow-600/20 text-yellow-300 rounded-md text-xs">
+                      Archived
                     </span>
                   )}
                 </div>
@@ -284,7 +261,7 @@ export default function SEODashboard() {
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-400 flex items-center">
                     <Calendar className="w-4 h-4 mr-1" />
-                    {new Date(project.lastCrawled).toLocaleDateString()}
+                    {new Date(Project.Created).toLocaleDateString()}
                   </span>
 
                   <div className="flex items-center space-x-1 ml-4">
@@ -305,7 +282,7 @@ export default function SEODashboard() {
         </div>
 
         {/* Empty State */}
-        {filteredProjects.length === 0 && (
+        {projects.length === 0 && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <Search className="w-12 h-12 text-gray-400" />
