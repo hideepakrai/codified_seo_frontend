@@ -2,9 +2,11 @@ import { useState } from "react";
 
 import { Search, User, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 export const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user: isLoggedIn } = useAuth();
+
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   return (

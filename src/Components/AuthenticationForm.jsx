@@ -8,6 +8,7 @@ import {
   User,
   ArrowRight,
   CheckCircle,
+  Loader,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
@@ -26,7 +27,15 @@ export default function AuthPage() {
 
   const { pathname } = useLocation();
 
-  const { login, user } = useAuth();
+  const { login, user, loading } = useAuth();
+
+  if (loading) {
+    return <Loader />;
+  }
+
+  if (user) {
+    navigate("/dashboard");
+  }
 
   const selectLogin = {
     "/signin": true,
