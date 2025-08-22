@@ -19,17 +19,49 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  AlertCircle,
+  Database,
 } from "lucide-react";
 import axios from "axios";
 import { Link } from "react-router";
 
 export default function SEODashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [projects, setProjects] = useState([]);
+
+  // useEffect(() => {
+  //   const fetchAllIssues = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${import.meta.env.VITE_API_URI}/issues?pid=13`,
+  //         {
+  //           withCredentials: true,
+  //         }
+  //       );
+
+  //       if (response.data.ok) {
+  //         console.log(response);
+  //         const res = await axios.get(
+  //           `${import.meta.env.VITE_API_URI}/issues/view?pid=13&eid=ERROR_30x`,
+  //           {
+  //             withCredentials: true,
+  //           }
+  //         );
+  //         console.log(res.data);
+  //       }
+  //     } catch (error) {
+  //       // projets
+  //       // setProjects([]);
+  //       // setError(error.message);
+  //     } finally {
+  //       // setLoading(false);
+  //     }
+  //   };
+
+  //   fetchAllIssues();
+  // }, []);
 
   useEffect(() => {
     const fetchAllProjects = async () => {
@@ -72,38 +104,6 @@ export default function SEODashboard() {
       console.log(error);
     }
   };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "completed":
-        return "text-green-400 bg-green-400/20";
-      case "running":
-        return "text-blue-400 bg-blue-400/20";
-      case "failed":
-        return "text-red-400 bg-red-400/20";
-      default:
-        return "text-gray-400 bg-gray-400/20";
-    }
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "completed":
-        return <CheckCircle className="w-4 h-4" />;
-      case "running":
-        return <Clock className="w-4 h-4" />;
-      case "failed":
-        return <XCircle className="w-4 h-4" />;
-      default:
-        return <Clock className="w-4 h-4" />;
-    }
-  };
-
-  // const filteredProjects = projects.filter(
-  //   (project) =>
-  //     project.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     project.url.toLowerCase().includes(searchQuery.toLowerCase())
-  // );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -213,34 +213,40 @@ export default function SEODashboard() {
               </div>
 
               {/* Stats Row */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                <div className="bg-black/20 rounded-xl p-3">
-                  <div className="text-2xl font-bold text-white">
-                    {Project.Host || "-"}
+              {Crawl.Id !== 0 && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                  <div className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all">
+                    <Activity className="w-6 h-6 text-white" />
+                    <div className="text-2xl font-bold text-white">
+                      Dashboard
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-400">Host</div>
-                </div>
-                <div className="bg-black/20 rounded-xl p-3">
-                  <div className="text-2xl font-bold text-yellow-400">
-                    {Project.UserAgent.length > 15
-                      ? Project.UserAgent.slice(0, 15) + "..."
-                      : Project.UserAgent}
+
+                  <Link
+                    to={`/crawl/${Project.Id}`}
+                    className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all"
+                  >
+                    <AlertCircle className="w-6 h-6 text-yellow-400" />
+                    <div className="text-2xl font-bold text-yellow-400">
+                      Site Issues
+                    </div>
+                  </Link>
+
+                  <div className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all">
+                    <Download className="w-6 h-6 text-blue-400" />
+                    <div className="text-2xl font-bold text-blue-400">
+                      Export
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-400">User Agent</div>
-                </div>
-                <div className="bg-black/20 rounded-xl p-3">
-                  <div className="text-2xl font-bold text-blue-400">
-                    {new Date(Project.Created).toLocaleDateString()}
+
+                  <div className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all">
+                    <Database className="w-6 h-6 text-green-400" />
+                    <div className="text-2xl font-bold text-green-400">
+                      Page Details
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-400">Created</div>
                 </div>
-                <div className="bg-black/20 rounded-xl p-3">
-                  <div className="text-2xl font-bold text-green-400">
-                    {Project.BasicAuth ? "Yes" : "No"}
-                  </div>
-                  <div className="text-sm text-gray-400">Basic Auth</div>
-                </div>
-              </div>
+              )}
 
               {/* Features & Actions */}
               <div className="flex items-center justify-between">

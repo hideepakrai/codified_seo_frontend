@@ -10,6 +10,9 @@ import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoutes } from "./Components/ProtectedRoutes";
 import AddProjectForm from "./Components/ProjectsAdd";
 import CrawlComponent from "./Components/Crawl";
+import CrawlSummary from "./Components/Issuepage";
+import IssueView from "./Components/IssueView";
+import IssueDetails from "./Components/Singleissue";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +49,30 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoutes>
             <CrawlComponent />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/crawl/:id",
+        element: (
+          <ProtectedRoutes>
+            <CrawlSummary />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/issues/view",
+        element: (
+          <ProtectedRoutes>
+            <IssueView /> IssueDetails
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/resources",
+        element: (
+          <ProtectedRoutes>
+            <IssueDetails />
           </ProtectedRoutes>
         ),
       },

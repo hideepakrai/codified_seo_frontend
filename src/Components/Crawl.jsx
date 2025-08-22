@@ -463,205 +463,205 @@
 // import axios from "axios";
 
 // export default function CrawlComponent({ projectData }) {
-//   const [crawlStatus, setCrawlStatus] = useState("idle"); // idle, starting, running, completed
-//   const [crawlData, setCrawlData] = useState({
-//     pagesFound: 0,
-//     pagesCrawled: 0,
-//     currentUrl: "",
-//     elapsed: 0,
-//   });
-//   const [logs, setLogs] = useState([]);
-//   const [showLogs, setShowLogs] = useState(false);
-//   const [wsurl, setWsurl] = useState(null);
-//   const wsRef = useRef(null);
-//   const [searchParams] = useSearchParams();
+// const [crawlStatus, setCrawlStatus] = useState("idle"); // idle, starting, running, completed
+// const [crawlData, setCrawlData] = useState({
+//   pagesFound: 0,
+//   pagesCrawled: 0,
+//   currentUrl: "",
+//   elapsed: 0,
+// });
+// const [logs, setLogs] = useState([]);
+// const [showLogs, setShowLogs] = useState(false);
+// const [wsurl, setWsurl] = useState(null);
+// const wsRef = useRef(null);
+// const [searchParams] = useSearchParams();
 
-//   const id = searchParams.get("pid");
-//   const [crawling, setCrawling] = useState(
-//     searchParams.get("Crawling") === "true"
-//   );
+// const id = searchParams.get("pid");
+// const [crawling, setCrawling] = useState(
+//   searchParams.get("Crawling") === "true"
+// );
 
-//   const progress =
-//     crawlData.pagesFound > 0
-//       ? (crawlData.pagesCrawled / crawlData.pagesFound) * 100
-//       : 0;
+// const progress =
+//   crawlData.pagesFound > 0
+//     ? (crawlData.pagesCrawled / crawlData.pagesFound) * 100
+//     : 0;
 
-//   const stopCrawl = async () => {
-//     try {
-//       const response = await axios.get(
-//         `${import.meta.env.VITE_API_URI}/crawl/stop?pid=${id}`,
-//         { withCredentials: true }
-//       );
-//       if (response.status === 200) {
-//         if (wsRef.current) {
-//           wsRef.current.close();
-//           wsRef.current = null;
-//         }
-//         setCrawlStatus("idle");
-//         setWsurl(null);
-//         setCrawling(false);
+// const stopCrawl = async () => {
+//   try {
+//     const response = await axios.get(
+//       `${import.meta.env.VITE_API_URI}/crawl/stop?pid=${id}`,
+//       { withCredentials: true }
+//     );
+//     if (response.status === 200) {
+//       if (wsRef.current) {
+//         wsRef.current.close();
+//         wsRef.current = null;
 //       }
-//     } catch (error) {
-//       console.error("Error stopping crawl:", error);
-//     }
-//   };
-
-//   const startCrawl = async (crawling) => {
-//     try {
-//       setCrawlStatus("starting");
-//       let response = null;
-//       if (!crawling) {
-//         response = await axios.get(
-//           `${import.meta.env.VITE_API_URI}/crawl/start?pid=${id}`,
-//           { withCredentials: true }
-//         );
-//       }
-//       if (response != null) {
-//         const liveResp = await axios.get(
-//           `${import.meta.env.VITE_API_URI}/crawl/live?pid=${id}`,
-//           { withCredentials: true }
-//         );
-//         setWsurl(liveResp.data.ws_url);
-//       } else if (crawling) {
-//         setWsurl(`ws://localhost:9000/crawl/ws?pid=${id}`);
-//       }
-//     } catch (error) {
-//       console.error("Error starting crawl:", error);
 //       setCrawlStatus("idle");
-//       stopCrawl();
+//       setWsurl(null);
 //       setCrawling(false);
 //     }
+//   } catch (error) {
+//     console.error("Error stopping crawl:", error);
+//   }
+// };
+
+// const startCrawl = async (crawling) => {
+//   try {
+//     setCrawlStatus("starting");
+//     let response = null;
+//     if (!crawling) {
+//       response = await axios.get(
+//         `${import.meta.env.VITE_API_URI}/crawl/start?pid=${id}`,
+//         { withCredentials: true }
+//       );
+//     }
+//     if (response != null) {
+//       const liveResp = await axios.get(
+//         `${import.meta.env.VITE_API_URI}/crawl/live?pid=${id}`,
+//         { withCredentials: true }
+//       );
+//       setWsurl(liveResp.data.ws_url);
+//     } else if (crawling) {
+//       setWsurl(`ws://localhost:9000/crawl/ws?pid=${id}`);
+//     }
+//   } catch (error) {
+//     console.error("Error starting crawl:", error);
+//     setCrawlStatus("idle");
+//     stopCrawl();
+//     setCrawling(false);
+//   }
+// };
+
+// useEffect(() => {
+//   startCrawl(crawling);
+// }, []);
+
+// useEffect(() => {
+//   if (!wsurl) return;
+
+//   const ws = new WebSocket(wsurl);
+//   wsRef.current = ws;
+
+//   ws.onopen = () => {
+//     console.log("✅ WebSocket connected:", wsurl);
+//     setCrawlStatus("running");
+//     setLogs((prev) => [
+//       {
+//         type: "success",
+//         message: "Connected to live crawl",
+//         timestamp: new Date(),
+//       },
+//       ...prev,
+//     ]);
 //   };
 
-//   useEffect(() => {
-//     startCrawl(crawling);
-//   }, []);
+//   ws.onmessage = (event) => {
+//     try {
+//       const data = JSON.parse(event.data);
+//       console.log("📨 WS Message:", data);
 
-//   useEffect(() => {
-//     if (!wsurl) return;
+//       if (data.name === "PageReport") {
+//         setCrawlData((prev) => ({
+//           ...prev,
+//           pagesCrawled: data.data.crawled,
+//           pagesFound: data.data.discovered,
+//           currentUrl: data.data.url,
+//         }));
 
-//     const ws = new WebSocket(wsurl);
-//     wsRef.current = ws;
-
-//     ws.onopen = () => {
-//       console.log("✅ WebSocket connected:", wsurl);
-//       setCrawlStatus("running");
-//       setLogs((prev) => [
-//         {
-//           type: "success",
-//           message: "Connected to live crawl",
-//           timestamp: new Date(),
-//         },
-//         ...prev,
-//       ]);
-//     };
-
-//     ws.onmessage = (event) => {
-//       try {
-//         const data = JSON.parse(event.data);
-//         console.log("📨 WS Message:", data);
-
-//         if (data.name === "PageReport") {
-//           setCrawlData((prev) => ({
-//             ...prev,
-//             pagesCrawled: data.data.crawled,
-//             pagesFound: data.data.discovered,
-//             currentUrl: data.data.url,
-//           }));
-
-//           setLogs((prev) => [
-//             {
-//               type: data.data.statusCode === 200 ? "success" : "error",
-//               message: `${data.data.statusCode} - ${data.data.url}`,
-//               timestamp: new Date(),
-//             },
-//             ...prev,
-//           ]);
-//         }
-
-//         if (data.name === "CrawlEnd") {
-//           setCrawlStatus("completed");
-//           setWsurl(null);
-//           ws.close();
-//         }
-//       } catch (err) {
-//         console.error("❌ Error parsing WS message:", err, event.data);
+//         setLogs((prev) => [
+//           {
+//             type: data.data.statusCode === 200 ? "success" : "error",
+//             message: `${data.data.statusCode} - ${data.data.url}`,
+//             timestamp: new Date(),
+//           },
+//           ...prev,
+//         ]);
 //       }
-//     };
 
-//     ws.onerror = (err) => {
-//       console.error("❌ WebSocket error:", err);
-//       setLogs((prev) => [
-//         { type: "error", message: "WebSocket error", timestamp: new Date() },
-//         ...prev,
-//       ]);
-//     };
-
-//     ws.onclose = () => {
-//       console.log("🔌 WebSocket closed");
-//       setLogs((prev) => [
-//         {
-//           type: "warning",
-//           message: "Disconnected from live crawl",
-//           timestamp: new Date(),
-//         },
-//         ...prev,
-//       ]);
-//       setWsurl(null);
-//     };
-
-//     return () => {
-//       if (ws && ws.readyState === WebSocket.OPEN) {
+//       if (data.name === "CrawlEnd") {
+//         setCrawlStatus("completed");
+//         setWsurl(null);
 //         ws.close();
 //       }
-//     };
-//   }, [wsurl]);
-
-//   const formatTime = (seconds) => {
-//     const hours = Math.floor(seconds / 3600);
-//     const minutes = Math.floor((seconds % 3600) / 60);
-//     const secs = seconds % 60;
-//     return `${hours}h ${minutes}m ${secs}s`;
-//   };
-
-//   const getStatusColor = (status) => {
-//     switch (status) {
-//       case "running":
-//         return "text-green-400 bg-green-400/20";
-//       case "completed":
-//         return "text-blue-400 bg-blue-400/20";
-//       case "starting":
-//         return "text-purple-400 bg-purple-400/20";
-//       default:
-//         return "text-gray-400 bg-gray-400/20";
+//     } catch (err) {
+//       console.error("❌ Error parsing WS message:", err, event.data);
 //     }
 //   };
 
-//   const getStatusIcon = (status) => {
-//     switch (status) {
-//       case "running":
-//         return <Activity className="w-4 h-4 animate-pulse" />;
-//       case "completed":
-//         return <CheckCircle className="w-4 h-4" />;
-//       case "starting":
-//         return <RefreshCw className="w-4 h-4 animate-spin" />;
-//       default:
-//         return <Clock className="w-4 h-4" />;
-//     }
+//   ws.onerror = (err) => {
+//     console.error("❌ WebSocket error:", err);
+//     setLogs((prev) => [
+//       { type: "error", message: "WebSocket error", timestamp: new Date() },
+//       ...prev,
+//     ]);
 //   };
 
-//   const getLogIcon = (type) => {
-//     switch (type) {
-//       case "success":
-//         return <CheckCircle className="w-4 h-4 text-green-400" />;
-//       case "error":
-//         return <XCircle className="w-4 h-4 text-red-400" />;
-//       case "warning":
-//         return <AlertCircle className="w-4 h-4 text-yellow-400" />;
-//       default:
-//         return <Globe className="w-4 h-4 text-blue-400" />;
+//   ws.onclose = () => {
+//     console.log("🔌 WebSocket closed");
+//     setLogs((prev) => [
+//       {
+//         type: "warning",
+//         message: "Disconnected from live crawl",
+//         timestamp: new Date(),
+//       },
+//       ...prev,
+//     ]);
+//     setWsurl(null);
+//   };
+
+//   return () => {
+//     if (ws && ws.readyState === WebSocket.OPEN) {
+//       ws.close();
 //     }
 //   };
+// }, [wsurl]);
+
+// const formatTime = (seconds) => {
+//   const hours = Math.floor(seconds / 3600);
+//   const minutes = Math.floor((seconds % 3600) / 60);
+//   const secs = seconds % 60;
+//   return `${hours}h ${minutes}m ${secs}s`;
+// };
+
+// const getStatusColor = (status) => {
+//   switch (status) {
+//     case "running":
+//       return "text-green-400 bg-green-400/20";
+//     case "completed":
+//       return "text-blue-400 bg-blue-400/20";
+//     case "starting":
+//       return "text-purple-400 bg-purple-400/20";
+//     default:
+//       return "text-gray-400 bg-gray-400/20";
+//   }
+// };
+
+// const getStatusIcon = (status) => {
+//   switch (status) {
+//     case "running":
+//       return <Activity className="w-4 h-4 animate-pulse" />;
+//     case "completed":
+//       return <CheckCircle className="w-4 h-4" />;
+//     case "starting":
+//       return <RefreshCw className="w-4 h-4 animate-spin" />;
+//     default:
+//       return <Clock className="w-4 h-4" />;
+//   }
+// };
+
+// const getLogIcon = (type) => {
+//   switch (type) {
+//     case "success":
+//       return <CheckCircle className="w-4 h-4 text-green-400" />;
+//     case "error":
+//       return <XCircle className="w-4 h-4 text-red-400" />;
+//     case "warning":
+//       return <AlertCircle className="w-4 h-4 text-yellow-400" />;
+//     default:
+//       return <Globe className="w-4 h-4 text-blue-400" />;
+//   }
+// };
 
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -869,10 +869,213 @@ import {
   ChevronUp,
   Monitor,
 } from "lucide-react";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import axios from "axios";
 
 export default function CrawlComponent({ projectData }) {
+  // const [crawlStatus, setCrawlStatus] = useState("idle"); // idle, starting, running, completed
+  // const [crawlData, setCrawlData] = useState({
+  //   pagesFound: 0,
+  //   pagesCrawled: 0,
+  //   currentUrl: "",
+  //   elapsed: 0,
+  // });
+  // const [logs, setLogs] = useState([]);
+  // const [showLogs, setShowLogs] = useState(false);
+  // const [expandedLogs, setExpandedLogs] = useState(false);
+  // const [wsurl, setWsurl] = useState(null);
+  // const wsRef = useRef(null);
+  // const [searchParams] = useSearchParams();
+
+  // const id = searchParams.get("pid");
+  // const [crawling, setCrawling] = useState(
+  //   searchParams.get("Crawling") === "true"
+  // );
+
+  // const progress =
+  //   crawlData.pagesFound > 0
+  //     ? (crawlData.pagesCrawled / crawlData.pagesFound) * 100
+  //     : 0;
+
+  // const stopCrawl = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${import.meta.env.VITE_API_URI}/crawl/stop?pid=${id}`,
+  //       { withCredentials: true }
+  //     );
+  //     if (response.status === 200) {
+  //       if (wsRef.current) {
+  //         wsRef.current.close();
+  //         wsRef.current = null;
+  //       }
+  //       setCrawlStatus("idle");
+  //       setWsurl(null);
+  //       setCrawling(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error stopping crawl:", error);
+  //   }
+  // };
+
+  // const startCrawl = async (crawling) => {
+  //   try {
+  //     setCrawlStatus("starting");
+  //     let response = null;
+  //     if (!crawling) {
+  //       response = await axios.get(
+  //         `${import.meta.env.VITE_API_URI}/crawl/start?pid=${id}`,
+  //         { withCredentials: true }
+  //       );
+  //     }
+  //     if (response != null) {
+  //       const liveResp = await axios.get(
+  //         `${import.meta.env.VITE_API_URI}/crawl/live?pid=${id}`,
+  //         { withCredentials: true }
+  //       );
+  //       setWsurl(liveResp.data.ws_url);
+  //     } else if (crawling) {
+  //       setWsurl(`ws://localhost:9000/crawl/ws?pid=${id}`);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error starting crawl:", error);
+  //     setCrawlStatus("idle");
+  //     stopCrawl();
+  //     setCrawling(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   startCrawl(crawling);
+  // }, []);
+
+  // useEffect(() => {
+  //   if (!wsurl) return;
+
+  //   const ws = new WebSocket(wsurl);
+  //   wsRef.current = ws;
+
+  //   ws.onopen = () => {
+  //     console.log("✅ WebSocket connected:", wsurl);
+  //     setCrawlStatus("running");
+  //     setLogs((prev) => [
+  //       {
+  //         type: "success",
+  //         message: "Connected to live crawl",
+  //         timestamp: new Date(),
+  //       },
+  //       ...prev,
+  //     ]);
+  //   };
+
+  //   ws.onmessage = (event) => {
+  //     try {
+  //       const data = JSON.parse(event.data);
+  //       console.log("📨 WS Message:", data);
+
+  //       if (data.name === "PageReport") {
+  //         setCrawlData((prev) => ({
+  //           ...prev,
+  //           pagesCrawled: data.data.crawled,
+  //           pagesFound: data.data.discovered,
+  //           currentUrl: data.data.url,
+  //         }));
+
+  //         setLogs((prev) => [
+  //           {
+  //             type: data.data.statusCode === 200 ? "success" : "error",
+  //             message: `${data.data.statusCode} - ${data.data.url}`,
+  //             timestamp: new Date(),
+  //           },
+  //           ...prev,
+  //         ]);
+  //       }
+
+  //       if (data.name === "CrawlEnd") {
+  //         setCrawlStatus("completed");
+  //         setWsurl(null);
+  //         ws.close();
+  //       }
+  //     } catch (err) {
+  //       console.error("❌ Error parsing WS message:", err, event.data);
+  //     }
+  //   };
+
+  //   ws.onerror = (err) => {
+  //     console.error("❌ WebSocket error:", err);
+  //     setLogs((prev) => [
+  //       { type: "error", message: "WebSocket error", timestamp: new Date() },
+  //       ...prev,
+  //     ]);
+  //   };
+
+  //   ws.onclose = () => {
+  //     console.log("🔌 WebSocket closed");
+  //     setLogs((prev) => [
+  //       {
+  //         type: "warning",
+  //         message: "Disconnected from live crawl",
+  //         timestamp: new Date(),
+  //       },
+  //       ...prev,
+  //     ]);
+  //     setWsurl(null);
+  //   };
+
+  //   return () => {
+  //     if (ws && ws.readyState === WebSocket.OPEN) {
+  //       ws.close();
+  //     }
+  //   };
+  // }, [wsurl]);
+
+  // const formatTime = (seconds) => {
+  //   const hours = Math.floor(seconds / 3600);
+  //   const minutes = Math.floor((seconds % 3600) / 60);
+  //   const secs = seconds % 60;
+  //   return `${hours}h ${minutes}m ${secs}s`;
+  // };
+
+  // const getStatusColor = (status) => {
+  //   switch (status) {
+  //     case "running":
+  //       return "text-green-400 bg-green-400/20";
+  //     case "completed":
+  //       return "text-blue-400 bg-blue-400/20";
+  //     case "starting":
+  //       return "text-purple-400 bg-purple-400/20";
+  //     default:
+  //       return "text-gray-400 bg-gray-400/20";
+  //   }
+  // };
+
+  // const getStatusIcon = (status) => {
+  //   switch (status) {
+  //     case "running":
+  //       return <Activity className="w-4 h-4 animate-pulse" />;
+  //     case "completed":
+  //       return <CheckCircle className="w-4 h-4" />;
+  //     case "starting":
+  //       return <RefreshCw className="w-4 h-4 animate-spin" />;
+  //     default:
+  //       return <Clock className="w-4 h-4" />;
+  //   }
+  // };
+
+  // const getLogIcon = (type) => {
+  //   switch (type) {
+  //     case "success":
+  //       return <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />;
+  //     case "error":
+  //       return <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />;
+  //     case "warning":
+  //       return (
+  //         <AlertCircle className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+  //       );
+  //     default:
+  //       return <Globe className="w-4 h-4 text-blue-400 flex-shrink-0" />;
+  //   }
+  // };
+
   const [crawlStatus, setCrawlStatus] = useState("idle"); // idle, starting, running, completed
   const [crawlData, setCrawlData] = useState({
     pagesFound: 0,
@@ -882,7 +1085,6 @@ export default function CrawlComponent({ projectData }) {
   });
   const [logs, setLogs] = useState([]);
   const [showLogs, setShowLogs] = useState(false);
-  const [expandedLogs, setExpandedLogs] = useState(false);
   const [wsurl, setWsurl] = useState(null);
   const wsRef = useRef(null);
   const [searchParams] = useSearchParams();
@@ -945,7 +1147,9 @@ export default function CrawlComponent({ projectData }) {
   };
 
   useEffect(() => {
-    startCrawl(crawling);
+    if (crawling) {
+      startCrawl(crawling);
+    }
   }, []);
 
   useEffect(() => {
@@ -1064,15 +1268,13 @@ export default function CrawlComponent({ projectData }) {
   const getLogIcon = (type) => {
     switch (type) {
       case "success":
-        return <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />;
+        return <CheckCircle className="w-4 h-4 text-green-400" />;
       case "error":
-        return <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />;
+        return <XCircle className="w-4 h-4 text-red-400" />;
       case "warning":
-        return (
-          <AlertCircle className="w-4 h-4 text-yellow-400 flex-shrink-0" />
-        );
+        return <AlertCircle className="w-4 h-4 text-yellow-400" />;
       default:
-        return <Globe className="w-4 h-4 text-blue-400 flex-shrink-0" />;
+        return <Globe className="w-4 h-4 text-blue-400" />;
     }
   };
 
@@ -1083,9 +1285,14 @@ export default function CrawlComponent({ projectData }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <button className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all">
-                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
+              <Link
+                to={"/dashboard"}
+                className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              >
+                <button className="">
+                  <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+              </Link>
               <div>
                 <h1 className="text-lg sm:text-2xl font-bold text-white">
                   Website Crawl
