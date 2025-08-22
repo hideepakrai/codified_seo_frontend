@@ -52,7 +52,26 @@ export default function SEODashboard() {
     fetchAllProjects();
   }, []);
 
-  console.log(projects);
+  const handleDeleteProjects = async (id) => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URI}/project/delete?pid=${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      if (response.data.ok) {
+        const copied = [...projects];
+        const final = copied.filter(({ Project }) => Project.Id !== id);
+        setProjects(final);
+      } else {
+        throw error;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -271,7 +290,10 @@ export default function SEODashboard() {
                     <button className="p-2 text-gray-400 hover:text-green-400 hover:bg-green-500/10 rounded-lg transition-all">
                       <Download className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all">
+                    <button
+                      onClick={() => handleDeleteProjects(Project.Id)}
+                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
