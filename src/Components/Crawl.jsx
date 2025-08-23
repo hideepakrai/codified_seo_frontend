@@ -872,7 +872,7 @@ import {
 import { Link, useSearchParams } from "react-router";
 import axios from "axios";
 
-export default function CrawlComponent({ projectData }) {
+export default function CrawlComponent() {
   // const [crawlStatus, setCrawlStatus] = useState("idle"); // idle, starting, running, completed
   // const [crawlData, setCrawlData] = useState({
   //   pagesFound: 0,
@@ -1136,7 +1136,13 @@ export default function CrawlComponent({ projectData }) {
         );
         setWsurl(liveResp.data.ws_url);
       } else if (crawling) {
-        setWsurl(`ws://localhost:9000/crawl/ws?pid=${id}`);
+        // const liveResp = await axios.get(
+        //   `${import.meta.env.VITE_API_URI}/crawl/live?pid=${id}`,
+        //   { withCredentials: true }
+        // );
+        // setWsurl(liveResp.data.ws_url);
+        // setWsurl(`ws:/codified-seo.onrender.com/crawl/ws?pid=${id}`);
+        setWsurl(`wss://codified-seo.onrender.com/crawl/ws?pid=${id}`);
       }
     } catch (error) {
       console.error("Error starting crawl:", error);
