@@ -26,10 +26,8 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(`${API_URL}/me`, {
         withCredentials: true,
       });
-      if (
-        (response.data.message =
-          "POST JSON or form fields {email, password} to /signin.")
-      ) {
+
+      if (response?.data?.fields) {
         setUser(null);
         setError(response.data.message);
       } else {
@@ -62,8 +60,6 @@ export const AuthProvider = ({ children }) => {
         },
         withCredentials: true,
       });
-
-      setUser(response.data);
       await fetchMe(); // refresh user state after login
       return response;
     } catch (err) {

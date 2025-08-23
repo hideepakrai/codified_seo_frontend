@@ -27,14 +27,10 @@ export default function AuthPage() {
 
   const { pathname } = useLocation();
 
-  const { login, user, loading } = useAuth();
+  const { login, loading } = useAuth();
 
   if (loading) {
     return <Loader />;
-  }
-
-  if (user) {
-    navigate("/dashboard");
   }
 
   const selectLogin = {
@@ -60,7 +56,6 @@ export default function AuthPage() {
         password,
       };
       const response = await login(data);
-      console.log(response);
       if (response.status === 200) {
         navigate("/dashboard");
       }
