@@ -26,9 +26,16 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(`${API_URL}/me`, {
         withCredentials: true,
       });
-
-      setUser(response.data); // store user data
-      setError(null);
+      if (
+        (response.data.message =
+          "POST JSON or form fields {email, password} to /signin.")
+      ) {
+        setUser(null);
+        setError(response.data.message);
+      } else {
+        setUser(response.data); // store user data
+        setError(null);
+      }
     } catch (err) {
       console.error("fetchMe error:", err);
       setUser(null);
