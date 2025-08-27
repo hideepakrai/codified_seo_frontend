@@ -31,38 +31,6 @@ export default function SEODashboard() {
   const [error, setError] = useState(null);
   const [projects, setProjects] = useState([]);
 
-  // useEffect(() => {
-  //   const fetchAllIssues = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `${import.meta.env.VITE_API_URI}/issues?pid=13`,
-  //         {
-  //           withCredentials: true,
-  //         }
-  //       );
-
-  //       if (response.data.ok) {
-  //         console.log(response);
-  //         const res = await axios.get(
-  //           `${import.meta.env.VITE_API_URI}/issues/view?pid=13&eid=ERROR_30x`,
-  //           {
-  //             withCredentials: true,
-  //           }
-  //         );
-  //         console.log(res.data);
-  //       }
-  //     } catch (error) {
-  //       // projets
-  //       // setProjects([]);
-  //       // setError(error.message);
-  //     } finally {
-  //       // setLoading(false);
-  //     }
-  //   };
-
-  //   fetchAllIssues();
-  // }, []);
-
   useEffect(() => {
     const fetchAllProjects = async () => {
       try {
@@ -88,7 +56,7 @@ export default function SEODashboard() {
       }
     };
     fetchAllProjects();
-  }, []);
+  }, [projects]);
 
   const handleDeleteProjects = async (id) => {
     try {
@@ -110,6 +78,15 @@ export default function SEODashboard() {
       console.log(error);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <div className="w-16 h-16 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+        <p className="ml-4 text-purple-200 font-semibold">Fetching Projects</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -221,12 +198,15 @@ export default function SEODashboard() {
               {/* Stats Row */}
               {Crawl.Id !== 0 && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <div className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all">
+                  <Link
+                    to={`/projectdashboard/${Project.Id}`}
+                    className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all"
+                  >
                     <Activity className="w-6 h-6 text-white" />
                     <div className="text-2xl font-bold text-white">
                       Dashboard
                     </div>
-                  </div>
+                  </Link>
 
                   <Link
                     to={`/crawl/${Project.Id}`}

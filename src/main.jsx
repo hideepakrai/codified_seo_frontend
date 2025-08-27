@@ -13,6 +13,7 @@ import CrawlComponent from "./Components/Crawl";
 import CrawlSummary from "./Components/Issuepage";
 import IssueView from "./Components/IssueView";
 import IssueDetails from "./Components/Singleissue";
+import { ProjectDashboard } from "./Components/ProjectDashboard";
 
 const router = createBrowserRouter([
   {
@@ -73,6 +74,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoutes>
             <IssueDetails />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/projectdashboard/:id",
+        element: (
+          <ProtectedRoutes>
+            <ProjectDashboard />
           </ProtectedRoutes>
         ),
       },
