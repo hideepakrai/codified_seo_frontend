@@ -1,13 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
-import { Download, ExternalLink } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router";
+import { ArrowBigLeft, Download, ExternalLink } from "lucide-react";
 
 export default function IssueView() {
   const [searchParams] = useSearchParams();
   const pid = searchParams.get("pid");
   const eid = searchParams.get("eid");
-
+  const navigate = useNavigate();
   const [data, setData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -81,7 +81,17 @@ export default function IssueView() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">{getStatusText()}</h2>
+          <div className="flex gap-2 item">
+            <button
+              onClick={() => {
+                navigate(-1);
+              }}
+              className="bg-black hover:bg-white hover:text-black w-10 h-10 text-white p-2 rounded-full transition-all duration-300"
+            >
+              <ArrowBigLeft />
+            </button>
+            <h2 className="text-2xl font-bold text-white">{getStatusText()}</h2>
+          </div>
           <button
             className="p-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition"
             onClick={() => alert("Download triggered")}

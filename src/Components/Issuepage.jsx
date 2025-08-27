@@ -5,8 +5,9 @@ import {
   XCircle,
   CheckCircle,
   ExternalLink,
+  ArrowBigLeft,
 } from "lucide-react";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { issueDescriptions, issues } from "../assets/Helper";
 
@@ -51,6 +52,8 @@ export default function CrawlSummary() {
   const percent = (val) =>
     totalIssues ? Math.round((val / totalIssues) * 100) : 0;
 
+  const navigate = useNavigate();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
@@ -66,12 +69,24 @@ export default function CrawlSummary() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Crawl Summary</h1>
-          <p className="text-gray-300">
-            Overview of issues and statistics for{" "}
-            <span className="font-semibold">{Project.Host}</span>
-          </p>
+        <div className="mb-8 flex gap-2 items-center">
+          <button
+            onClick={() => {
+              navigate(-1);
+            }}
+            className="bg-black hover:bg-white hover:text-black w-10 h-10 text-white p-2 rounded-full transition-all duration-300"
+          >
+            <ArrowBigLeft />
+          </button>
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">
+              Crawl Summary
+            </h1>
+            <p className="text-gray-300">
+              Overview of issues and statistics for{" "}
+              <span className="font-semibold">{Project.Host}</span>
+            </p>
+          </div>
         </div>
 
         {/* Top Stats Grid */}

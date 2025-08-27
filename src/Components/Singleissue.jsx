@@ -13,9 +13,11 @@ import {
   Type,
   List,
   Loader2,
+  ArrowBigRight,
+  ArrowBigLeft,
 } from "lucide-react";
 import { issueDescriptions } from "../assets/Helper";
-import { useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 import axios from "axios";
 
 export default function IssueDetails() {
@@ -28,6 +30,7 @@ export default function IssueDetails() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({});
   const [selectedOption, setSelectedOption] = useState(t || "details");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllIssues = async () => {
@@ -52,6 +55,8 @@ export default function IssueDetails() {
 
     fetchAllIssues();
   }, [selectedOption]);
+
+  console.log(data);
 
   if (loading) {
     return (
@@ -105,9 +110,19 @@ export default function IssueDetails() {
         {/* Page Report */}
         <div className="bg-gradient-to-br from-purple-800/40 to-purple-900/30 backdrop-blur-xl rounded-2xl border border-white/10 shadow-xl p-6 relative">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-purple-300 flex items-center">
-              <Info className="mr-2 w-5 h-5" /> Page Report
-            </h2>
+            <div className="flex gap-1">
+              <button
+                onClick={() => {
+                  navigate(-1);
+                }}
+                className="bg-black hover:bg-white hover:text-black  text-white p-1 rounded-full transition-all duration-300"
+              >
+                <ArrowBigLeft size={20} />
+              </button>
+              <h2 className="text-lg font-semibold text-purple-300 flex items-center">
+                <Info className="mr-2 w-5 h-5" /> Page Report
+              </h2>
+            </div>
 
             {/* Select Dropdown */}
             <select
@@ -226,19 +241,29 @@ export default function IssueDetails() {
             <p className="text-sm">No errors found.</p>
           ) : (
             <ul className="space-y-3">
-              {errors.map((err, i) => (
-                <li
-                  key={i}
-                  className="p-3 rounded-xl bg-red-900/40 border border-red-600/40 shadow-md"
-                >
-                  <p className="font-semibold text-white flex items-center gap-2">
-                    <XCircle className="w-4 h-4 text-red-300" /> {err}
-                  </p>
-                  <p className="text-sm text-gray-300 mt-1 break-words">
-                    {issueDescriptions[err] || "No description available."}
-                  </p>
-                </li>
-              ))}
+              {errors.map((err) => {
+                return (
+                  <li
+                    key={err.Id}
+                    className="p-3 rounded-xl bg-red-900/40 border border-red-600/40 shadow-md items-center flex justify-between"
+                  >
+                    <div>
+                      <p className="font-semibold text-white flex items-center gap-2">
+                        <XCircle className="w-4 h-4 text-red-300" /> {err}
+                      </p>
+                      <p className="text-sm text-gray-300 mt-1 break-words">
+                        {issueDescriptions[err] || "No description available."}
+                      </p>
+                    </div>
+                    <Link
+                      className="p-1 rounded-full bg-white"
+                      to={`/issues/view?pid=${pid}&eid=${err}`}
+                    >
+                      <ArrowBigRight color="black" fill="black" size={30} />
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

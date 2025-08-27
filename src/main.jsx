@@ -64,7 +64,7 @@ const router = createBrowserRouter([
         path: "/issues/view",
         element: (
           <ProtectedRoutes>
-            <IssueView /> IssueDetails
+            <IssueView />
           </ProtectedRoutes>
         ),
       },
