@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Search, User, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 export const Navbar = () => {
-  const { user: isLoggedIn } = useAuth();
+  const { user: isLoggedIn, logout } = useAuth();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
@@ -69,20 +70,20 @@ export const Navbar = () => {
                 {showProfileMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-xl rounded-lg border border-white/20 shadow-2xl">
                     <div className="p-2">
-                      <button className="w-full flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                      <Link
+                        to={"/dashboard"}
+                        className="w-full flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                      >
                         <User className="w-4 h-4" />
-                        <span>Profile</span>
-                      </button>
+                        <span>Dashboard</span>
+                      </Link>
                       <button className="w-full flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                         <Settings className="w-4 h-4" />
-                        <span>Settings</span>
+                        <span>Profile</span>
                       </button>
                       <hr className="border-white/20 my-2" />
                       <button
-                        onClick={() => {
-                          setIsLoggedIn(false);
-                          setShowProfileMenu(false);
-                        }}
+                        onClick={logout}
                         className="w-full flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                       >
                         <LogOut className="w-4 h-4" />

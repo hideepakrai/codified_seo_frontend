@@ -71,7 +71,13 @@ export default function SEODashboard() {
         });
 
         if (response.data.ok) {
-          setProjects(response.data.projects);
+          const sortedByCreated = response.data.projects.sort(
+            (a, b) =>
+              new Date(b.Project.Created).getTime() -
+              new Date(a.Project.Created).getTime()
+          );
+
+          setProjects(sortedByCreated);
         }
       } catch (error) {
         // projets
@@ -153,7 +159,7 @@ export default function SEODashboard() {
 
         {/* Projects Grid */}
         <div className="grid gap-6">
-          {projects.map(({ Project, Crawl }) => (
+          {projects.map(({ Project, Crawl }, index) => (
             <div
               key={Project.Id}
               className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6 hover:bg-white/15 transition-all cursor-pointer"
@@ -165,7 +171,7 @@ export default function SEODashboard() {
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold text-white mb-1">
-                      Project #{Project.Id}
+                      Project {index + 1}
                     </h3>
                     <p className="text-gray-300 flex items-center">
                       {Project.URL}

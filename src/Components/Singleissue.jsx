@@ -3,7 +3,7 @@ import {
   ExternalLink,
   Info,
   AlertCircle,
-  Link,
+  Link as LinkIcon,
   FileText,
   Hash,
   CheckCircle,
@@ -18,34 +18,6 @@ import { issueDescriptions } from "../assets/Helper";
 import { useSearchParams } from "react-router";
 import axios from "axios";
 
-// Mock Data
-const mockData = {
-  page_report_view: {
-    PageReport: {
-      Id: 11915,
-      URL: "https://fonts.gstatic.com/s/baijamjuree/v12/LDIoapSCOBt_aeQQ7ftydoa8W_o6kJox.ttf",
-      StatusCode: 200,
-      ContentType: "font/ttf",
-      MediaType: "font/ttf",
-      Size: 84024,
-      Depth: 4,
-      Timeout: false,
-      TTFB: 92,
-      Title: "",
-      Description: "",
-      Canonical: "",
-      H1: "",
-      H2: "",
-      Noindex: false,
-      Nofollow: false,
-      InSitemap: false,
-      Crawled: true,
-      BlockedByRobotstxt: false,
-    },
-    ErrorTypes: ["ERROR_MISSING_HSTS", "ERROR_UNDERSCORE_URL"],
-  },
-};
-
 export default function IssueDetails() {
   const [searchParams] = useSearchParams();
   const pid = searchParams.get("pid");
@@ -54,8 +26,8 @@ export default function IssueDetails() {
   const t = searchParams.get("t");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState(mockData);
-  const [selectedOption, setSelectedOption] = useState(t);
+  const [data, setData] = useState({});
+  const [selectedOption, setSelectedOption] = useState(t || "details");
 
   useEffect(() => {
     const fetchAllIssues = async () => {
@@ -68,12 +40,11 @@ export default function IssueDetails() {
         );
 
         if (res.data.ok) {
-          console.log(res.data.data);
           setData(res.data.data);
         }
-      } catch (error) {
+      } catch (err) {
         setData({});
-        setError(error.message);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -102,11 +73,13 @@ export default function IssueDetails() {
   }
 
   const report = data?.page_report_view?.PageReport || {};
+  const inlinks = data?.page_report_view?.InLinks || [];
+  const errors = data?.page_report_view?.ErrorTypes || [];
 
   // Map icons to fields
   const fieldIcons = {
     Id: <Hash className="w-4 h-4 text-purple-300" />,
-    URL: <Link className="w-4 h-4 text-blue-300" />,
+    URL: <LinkIcon className="w-4 h-4 text-blue-300" />,
     StatusCode: <CheckCircle className="w-4 h-4 text-green-300" />,
     ContentType: <FileText className="w-4 h-4 text-pink-300" />,
     MediaType: <FileText className="w-4 h-4 text-pink-300" />,
@@ -115,7 +88,7 @@ export default function IssueDetails() {
     TTFB: <Clock className="w-4 h-4 text-cyan-300" />,
     Title: <Type className="w-4 h-4 text-purple-300" />,
     Description: <Type className="w-4 h-4 text-purple-300" />,
-    Canonical: <Link className="w-4 h-4 text-blue-300" />,
+    Canonical: <LinkIcon className="w-4 h-4 text-blue-300" />,
     H1: <Type className="w-4 h-4 text-purple-300" />,
     H2: <Type className="w-4 h-4 text-purple-300" />,
     Noindex: <XCircle className="w-4 h-4 text-red-400" />,
@@ -201,16 +174,59 @@ export default function IssueDetails() {
           </div>
         </div>
 
+        {/* Inlinks */}
+        {inlinks.length > 0 && (
+          <div className="bg-gradient-to-br from-blue-900/40 to-blue-800/30 backdrop-blur-xl rounded-2xl border border-blue-500/30 shadow-xl p-6">
+            <h2 className="text-lg font-semibold text-blue-300 flex items-center mb-4">
+              <LinkIcon className="mr-2 w-5 h-5" /> Inlinks ({inlinks.length})
+            </h2>
+            <div className="space-y-3">
+              {inlinks.map((inlink, i) => (
+                <div
+                  key={i}
+                  className="p-3 rounded-xl bg-blue-900/20 border border-blue-600/30 shadow-sm"
+                >
+                  <div className="flex items-start gap-2 mb-2">
+                    <LinkIcon className="w-4 h-4 text-blue-300 mt-0.5" />
+                    <div className="flex-1 break-words">
+                      <p className="font-medium text-white text-sm">
+                        From: {inlink.PageReport.Title || "Untitled Page"}
+                      </p>
+                      <a
+                        href={inlink.PageReport.URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-300 hover:underline break-words inline-flex items-center gap-1"
+                      >
+                        {inlink.PageReport.URL}
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                  {inlink.Link.Text && (
+                    <div className="pl-6">
+                      <p className="text-xs text-gray-300">
+                        <span className="font-medium">Link Text:</span>{" "}
+                        {inlink.Link.Text.replace(/&amp;/g, "&")}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Errors */}
         <div className="bg-gradient-to-br from-red-900/40 to-red-800/30 backdrop-blur-xl rounded-2xl border border-red-500/30 shadow-xl p-6">
           <h2 className="text-lg font-semibold text-red-300 flex items-center mb-4">
             <AlertCircle className="mr-2 w-5 h-5" /> Errors
           </h2>
-          {data.page_report_view.ErrorTypes.length === 0 ? (
+          {errors.length === 0 ? (
             <p className="text-sm">No errors found.</p>
           ) : (
             <ul className="space-y-3">
-              {data.page_report_view.ErrorTypes.map((err, i) => (
+              {errors.map((err, i) => (
                 <li
                   key={i}
                   className="p-3 rounded-xl bg-red-900/40 border border-red-600/40 shadow-md"

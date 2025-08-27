@@ -9,12 +9,24 @@ import {
   User,
   LogOut,
   Settings,
+  Loader2,
 } from "lucide-react";
 import { Navbar } from "./Navbar";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 export default function SEOLandingPage() {
   const [activeFeature, setActiveFeature] = useState(0);
+
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900">
+        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+      </div>
+    );
+  }
 
   const features = [
     {
@@ -82,11 +94,11 @@ export default function SEOLandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Link
-                to={"/dashboard"}
+                to={!user ? "/signup" : "/dashboard"}
                 className="group bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 shadow-2xl"
               >
                 <button className="cursor-pointer">
-                  Start Free Trial
+                  {user ? "Dashboard" : "Start Free Trail"}
                   <ArrowRight className="w-5 h-5 ml-2 inline-block group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>

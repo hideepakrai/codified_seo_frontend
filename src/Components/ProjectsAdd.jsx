@@ -13,14 +13,9 @@ import {
   Save,
 } from "lucide-react";
 import axios from "axios";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
-export default function AddProjectForm(
-  {
-    //   onBack = () => {},
-    //   onSave = () => {},
-  }
-) {
+export default function AddProjectForm() {
   const [formData, setFormData] = useState({
     url: "",
     ignoreRobotsTxt: false,
@@ -61,6 +56,8 @@ export default function AddProjectForm(
     });
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = async () => {
     try {
       setLoading(true);
@@ -79,8 +76,10 @@ export default function AddProjectForm(
           },
         }
       );
-      if (response.status == 200) {
-        console.log(response);
+
+      console.log(response);
+      if (response.data.message == "Project created") {
+        navigate("/dashboard");
       }
     } catch (error) {
       console.log(error);

@@ -9,6 +9,7 @@ import {
   ArrowRight,
   CheckCircle,
   Loader,
+  Loader2,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
@@ -30,7 +31,11 @@ export default function AuthPage() {
   const { login, loading } = useAuth();
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900">
+        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+      </div>
+    );
   }
 
   const selectLogin = {
@@ -56,7 +61,10 @@ export default function AuthPage() {
         password,
       };
       const response = await login(data);
-      if (response.status === 200) {
+      console.log(response);
+      if (response?.data?.fields) {
+        console.log("---->>", response.data.message);
+      } else if (response.status === 200) {
         navigate("/dashboard");
       }
     }

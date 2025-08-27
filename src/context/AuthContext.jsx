@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
         },
         withCredentials: true,
       });
-      await fetchMe(); // refresh user state after login
+      setUser(response.data); // refresh user state after login
       return response;
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       setUser(response.data);
-      await fetchMe(); // refresh user state after signup
+      // refresh user state after signup
       return response;
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     setLoading(true);
     try {
-      await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
+      await axios.get(`${API_URL}/signout`, {}, { withCredentials: true });
       setUser(null);
     } catch (err) {
       console.error("Logout error:", err);

@@ -850,7 +850,7 @@
 //   );
 // }
 
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Play,
   Pause,
@@ -865,216 +865,14 @@ import {
   Eye,
   Download,
   RefreshCw,
-  ChevronDown,
-  ChevronUp,
-  Monitor,
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router";
 import axios from "axios";
 
 export default function CrawlComponent() {
-  // const [crawlStatus, setCrawlStatus] = useState("idle"); // idle, starting, running, completed
-  // const [crawlData, setCrawlData] = useState({
-  //   pagesFound: 0,
-  //   pagesCrawled: 0,
-  //   currentUrl: "",
-  //   elapsed: 0,
-  // });
-  // const [logs, setLogs] = useState([]);
-  // const [showLogs, setShowLogs] = useState(false);
-  // const [expandedLogs, setExpandedLogs] = useState(false);
-  // const [wsurl, setWsurl] = useState(null);
-  // const wsRef = useRef(null);
-  // const [searchParams] = useSearchParams();
-
-  // const id = searchParams.get("pid");
-  // const [crawling, setCrawling] = useState(
-  //   searchParams.get("Crawling") === "true"
-  // );
-
-  // const progress =
-  //   crawlData.pagesFound > 0
-  //     ? (crawlData.pagesCrawled / crawlData.pagesFound) * 100
-  //     : 0;
-
-  // const stopCrawl = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `${import.meta.env.VITE_API_URI}/crawl/stop?pid=${id}`,
-  //       { withCredentials: true }
-  //     );
-  //     if (response.status === 200) {
-  //       if (wsRef.current) {
-  //         wsRef.current.close();
-  //         wsRef.current = null;
-  //       }
-  //       setCrawlStatus("idle");
-  //       setWsurl(null);
-  //       setCrawling(false);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error stopping crawl:", error);
-  //   }
-  // };
-
-  // const startCrawl = async (crawling) => {
-  //   try {
-  //     setCrawlStatus("starting");
-  //     let response = null;
-  //     if (!crawling) {
-  //       response = await axios.get(
-  //         `${import.meta.env.VITE_API_URI}/crawl/start?pid=${id}`,
-  //         { withCredentials: true }
-  //       );
-  //     }
-  //     if (response != null) {
-  //       const liveResp = await axios.get(
-  //         `${import.meta.env.VITE_API_URI}/crawl/live?pid=${id}`,
-  //         { withCredentials: true }
-  //       );
-  //       setWsurl(liveResp.data.ws_url);
-  //     } else if (crawling) {
-  //       setWsurl(`ws://localhost:9000/crawl/ws?pid=${id}`);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error starting crawl:", error);
-  //     setCrawlStatus("idle");
-  //     stopCrawl();
-  //     setCrawling(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   startCrawl(crawling);
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!wsurl) return;
-
-  //   const ws = new WebSocket(wsurl);
-  //   wsRef.current = ws;
-
-  //   ws.onopen = () => {
-  //     console.log("✅ WebSocket connected:", wsurl);
-  //     setCrawlStatus("running");
-  //     setLogs((prev) => [
-  //       {
-  //         type: "success",
-  //         message: "Connected to live crawl",
-  //         timestamp: new Date(),
-  //       },
-  //       ...prev,
-  //     ]);
-  //   };
-
-  //   ws.onmessage = (event) => {
-  //     try {
-  //       const data = JSON.parse(event.data);
-  //       console.log("📨 WS Message:", data);
-
-  //       if (data.name === "PageReport") {
-  //         setCrawlData((prev) => ({
-  //           ...prev,
-  //           pagesCrawled: data.data.crawled,
-  //           pagesFound: data.data.discovered,
-  //           currentUrl: data.data.url,
-  //         }));
-
-  //         setLogs((prev) => [
-  //           {
-  //             type: data.data.statusCode === 200 ? "success" : "error",
-  //             message: `${data.data.statusCode} - ${data.data.url}`,
-  //             timestamp: new Date(),
-  //           },
-  //           ...prev,
-  //         ]);
-  //       }
-
-  //       if (data.name === "CrawlEnd") {
-  //         setCrawlStatus("completed");
-  //         setWsurl(null);
-  //         ws.close();
-  //       }
-  //     } catch (err) {
-  //       console.error("❌ Error parsing WS message:", err, event.data);
-  //     }
-  //   };
-
-  //   ws.onerror = (err) => {
-  //     console.error("❌ WebSocket error:", err);
-  //     setLogs((prev) => [
-  //       { type: "error", message: "WebSocket error", timestamp: new Date() },
-  //       ...prev,
-  //     ]);
-  //   };
-
-  //   ws.onclose = () => {
-  //     console.log("🔌 WebSocket closed");
-  //     setLogs((prev) => [
-  //       {
-  //         type: "warning",
-  //         message: "Disconnected from live crawl",
-  //         timestamp: new Date(),
-  //       },
-  //       ...prev,
-  //     ]);
-  //     setWsurl(null);
-  //   };
-
-  //   return () => {
-  //     if (ws && ws.readyState === WebSocket.OPEN) {
-  //       ws.close();
-  //     }
-  //   };
-  // }, [wsurl]);
-
-  // const formatTime = (seconds) => {
-  //   const hours = Math.floor(seconds / 3600);
-  //   const minutes = Math.floor((seconds % 3600) / 60);
-  //   const secs = seconds % 60;
-  //   return `${hours}h ${minutes}m ${secs}s`;
-  // };
-
-  // const getStatusColor = (status) => {
-  //   switch (status) {
-  //     case "running":
-  //       return "text-green-400 bg-green-400/20";
-  //     case "completed":
-  //       return "text-blue-400 bg-blue-400/20";
-  //     case "starting":
-  //       return "text-purple-400 bg-purple-400/20";
-  //     default:
-  //       return "text-gray-400 bg-gray-400/20";
-  //   }
-  // };
-
-  // const getStatusIcon = (status) => {
-  //   switch (status) {
-  //     case "running":
-  //       return <Activity className="w-4 h-4 animate-pulse" />;
-  //     case "completed":
-  //       return <CheckCircle className="w-4 h-4" />;
-  //     case "starting":
-  //       return <RefreshCw className="w-4 h-4 animate-spin" />;
-  //     default:
-  //       return <Clock className="w-4 h-4" />;
-  //   }
-  // };
-
-  // const getLogIcon = (type) => {
-  //   switch (type) {
-  //     case "success":
-  //       return <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />;
-  //     case "error":
-  //       return <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />;
-  //     case "warning":
-  //       return (
-  //         <AlertCircle className="w-4 h-4 text-yellow-400 flex-shrink-0" />
-  //       );
-  //     default:
-  //       return <Globe className="w-4 h-4 text-blue-400 flex-shrink-0" />;
-  //   }
-  // };
+  const ws = import.meta.env.VITE_WS_URL
+    ? import.meta.env.VITE_WS_URL
+    : "wss://codified-seo.onrender.com/crawl";
 
   const [crawlStatus, setCrawlStatus] = useState("idle"); // idle, starting, running, completed
   const [crawlData, setCrawlData] = useState({
@@ -1134,6 +932,7 @@ export default function CrawlComponent() {
           `${import.meta.env.VITE_API_URI}/crawl/live?pid=${id}`,
           { withCredentials: true }
         );
+        console.log("--->>>>URL", liveResp.data.ws_url);
         setWsurl(liveResp.data.ws_url);
       } else if (crawling) {
         // const liveResp = await axios.get(
@@ -1142,7 +941,7 @@ export default function CrawlComponent() {
         // );
         // setWsurl(liveResp.data.ws_url);
         // setWsurl(`ws:/codified-seo.onrender.com/crawl/ws?pid=${id}`);
-        setWsurl(`wss://codified-seo.onrender.com/crawl/ws?pid=${id}`);
+        setWsurl(`${ws}/ws?pid=${id}`);
       }
     } catch (error) {
       console.error("Error starting crawl:", error);
@@ -1380,7 +1179,7 @@ export default function CrawlComponent() {
             <div className="mt-6">
               <div className="flex justify-between text-sm text-gray-300 mb-2">
                 <span>Crawl Progress</span>
-                <span>{Math.round(progress)}%</span>
+                <span>{Math.round(Math.min(progress, 100))}%</span>
               </div>
               <div className="w-full bg-black/30 rounded-full h-2">
                 <div
