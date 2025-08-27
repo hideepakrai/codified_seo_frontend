@@ -14,6 +14,47 @@ export default function IssueView() {
 
   const [currentPage, setCurrentPage] = useState(1);
 
+  const handleExportURL = async () => {
+    try {
+      // csv?pid=2491&eid=ERROR_SHORT_TITLE
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URI}/export/csv?pid=${pid}&eid=${eid}`,
+        {
+          withCredentials: true,
+          responseType: "blob", // so we can download the file
+        }
+      );
+      // const res = await axios.get(
+      //   `${import.meta.env.VITE_API_URI}/export/resources?pid=${pid}&t=issues`,
+      //   {
+      //     withCredentials: true,
+      //     responseType: "blob", // so we can download the file
+      //   }
+      // );
+
+      // trigger file download
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // get filename from header if provided
+      const contentDisposition = res.headers["content-disposition"];
+      let fileName = "export.csv";
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match?.[1]) fileName = match[1];
+      }
+
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Download failed", err);
+    }
+  };
+
   useEffect(() => {
     const fetchAllIssues = async () => {
       try {
@@ -93,10 +134,11 @@ export default function IssueView() {
             <h2 className="text-2xl font-bold text-white">{getStatusText()}</h2>
           </div>
           <button
-            className="p-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition"
-            onClick={() => alert("Download triggered")}
+            onClick={handleExportURL}
+            className="p-2 rounded-full bg-white/10 border border-white/20 hover:bg-white/20 transition flex gap-1 items-center cursor-pointer"
           >
-            <Download className="w-5 h-5 text-purple-300" />
+            <Download className="w-5 h-5 text-purple-300" />{" "}
+            <span className="font-bold text-white">Export</span>
           </button>
         </div>
 

@@ -6,6 +6,7 @@ import {
   CheckCircle,
   ExternalLink,
   ArrowBigLeft,
+  DownloadIcon,
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
@@ -18,6 +19,39 @@ export default function CrawlSummary() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const { id } = useParams();
+
+  const handleExportURL = async () => {
+    try {
+      // csv?pid=2491&eid=ERROR_SHORT_TITLE
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URI}/export/resources?pid=${id}&t=issues`,
+        {
+          withCredentials: true,
+          responseType: "blob", // so we can download the file
+        }
+      );
+
+      // trigger file download
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // get filename from header if provided
+      const contentDisposition = res.headers["content-disposition"];
+      let fileName = "export.csv";
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match?.[1]) fileName = match[1];
+      }
+
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Download failed", err);
+    }
+  };
 
   useEffect(() => {
     const fetchAllIssues = async (id) => {
@@ -123,6 +157,12 @@ export default function CrawlSummary() {
                 {Project.AllowSubdomains ? "Yes" : "No"}
               </p>
             </div>
+            <button
+              onClick={handleExportURL}
+              className="flex gap-3 py-2 px-3 mt-2 bg-black text-white cursor-pointer hover:text-black hover:bg-white font-bold rounded-lg items-center transition-colors duration-300"
+            >
+              Export Data <DownloadIcon size={20} />
+            </button>
           </div>
 
           {/* Crawl Stats */}
