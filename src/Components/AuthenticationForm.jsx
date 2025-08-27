@@ -18,17 +18,15 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
   const navigate = useNavigate();
 
   const { pathname } = useLocation();
 
-  const { login, loading } = useAuth();
+  const { login, loading, signup } = useAuth();
 
   if (loading) {
     return (
@@ -54,14 +52,24 @@ export default function AuthPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, name, password, confirmPassword } = formData;
+    const { email, password } = formData;
     if (isLogin) {
       const data = {
         email,
         password,
       };
       const response = await login(data);
-      console.log(response);
+      if (response?.data?.fields) {
+        console.log("---->>", response.data.message);
+      } else if (response.status === 200) {
+        navigate("/dashboard");
+      }
+    } else {
+      const data = {
+        email,
+        password,
+      };
+      const response = await signup(data);
       if (response?.data?.fields) {
         console.log("---->>", response.data.message);
       } else if (response.status === 200) {
@@ -126,11 +134,10 @@ export default function AuthPage() {
                     : "Fill in your details to get started"}
                 </p>
               </div>
-
               {/* Form */}
               <div className="space-y-6">
                 {/* Name Field (Signup only) */}
-                {!isLogin && (
+                {/* {!isLogin && (
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Full Name
@@ -148,7 +155,7 @@ export default function AuthPage() {
                       />
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Email Field */}
                 <div>
@@ -199,7 +206,7 @@ export default function AuthPage() {
                   </div>
                 </div>
 
-                {/* Confirm Password Field (Signup only) */}
+                {/* Confirm Password Field (Signup only)
                 {!isLogin && (
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -231,7 +238,7 @@ export default function AuthPage() {
                       </button>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Forgot Password (Login only) */}
                 {isLogin && (
@@ -245,7 +252,7 @@ export default function AuthPage() {
                   </div>
                 )}
 
-                {/* Terms & Conditions (Signup only) */}
+                {/* Terms & Conditions (Signup only)
                 {!isLogin && (
                   <div className="flex items-start space-x-3">
                     <input
@@ -271,7 +278,7 @@ export default function AuthPage() {
                       </a>
                     </label>
                   </div>
-                )}
+                )} */}
 
                 {/* Submit Button */}
                 <button
@@ -283,8 +290,7 @@ export default function AuthPage() {
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
-
-              {/* Social Login Options */}
+              {/* Social Login Options
               <div className="mt-8">
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
@@ -335,8 +341,7 @@ export default function AuthPage() {
                     <span className="ml-2">Google</span>
                   </button>
                 </div>
-              </div>
-
+              </div> */}
               {/* Toggle Between Login/Signup */}
               <div className="mt-8 text-center">
                 <p className="text-gray-300">
