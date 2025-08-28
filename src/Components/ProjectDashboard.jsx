@@ -1,229 +1,7 @@
-// import axios from "axios";
-// import { useEffect, useState } from "react";
-// import { useParams } from "react-router";
-
-// import {
-//   LineChart,
-//   Line,
-//   BarChart,
-//   Bar,
-//   XAxis,
-//   YAxis,
-//   Tooltip,
-//   Legend,
-//   CartesianGrid,
-//   PieChart,
-//   Pie,
-//   Cell,
-//   ResponsiveContainer,
-// } from "recharts";
-
-// export const ProjectDashboard = () => {
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-//   const [data, setData] = useState(null);
-//   const { id } = useParams();
-//   const [projects, setProjects] = useState(null)
-//   useEffect(() => {
-//     const fetchAllProjects = async () => {
-//       try {
-//         const response = await axios.get(
-//           `${import.meta.env.VITE_API_URI}/dashboard?pid=${id}`,
-//           {
-//             withCredentials: true,
-//           }
-//         );
-
-//         if (response.data.ok) {
-//           // const sortedByCreated = response.data.projects.sort(
-//           //   (a, b) =>
-//           //     new Date(b.Project.Created).getTime() -
-//           //     new Date(a.Project.Created).getTime()
-//           // );
-
-//           setData(response.data.data);
-
-//           setProjects(response.data.project_view);
-//         }
-//       } catch (error) {
-//         // projets
-//         setData([]);
-//         setProjects([])
-//         setError(error.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchAllProjects();
-//   }, []);
-
-//   if (loading) {
-//     return (
-//       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-//         <div className="w-16 h-16 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-//         <p className="ml-4 text-purple-200 font-semibold">Fetching Charts</p>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div>
-//       <div>
-//         <CrawlHistory crawls={data.crawls} />
-//         <IssuesHistory crawls={data.crawls} />
-//         <IssueTypesPie crawl={data.project_view.Crawl} />
-//         <CanonicalPie canonical={data.canonical_count} />
-//         <ImagesAltPie alt={data.alt_count} />
-//         <StatusCodeByDepth statusDepth={data.status_code_by_depth} />
-//       </div>
-//     </div>
-//   );
-// };
-
-// // colors for pie charts
-// const COLORS = ["#0088FE", "#FFBB28", "#FF8042", "#00C49F", "#FF4444"];
-
-// export function CrawlHistory({ crawls }) {
-//   const data = crawls.map((c) => ({
-//     date: new Date(c.Start).toLocaleTimeString(),
-//     urls: c.TotalURLs,
-//   }));
-//   return (
-//     <ResponsiveContainer width="100%" height={250}>
-//       <BarChart data={data}>
-//         <CartesianGrid strokeDasharray="3 3" />
-//         <XAxis dataKey="date" />
-//         <YAxis />
-//         <Tooltip />
-//         <Bar dataKey="urls" fill="#0088FE" />
-//       </BarChart>
-//     </ResponsiveContainer>
-//   );
-// }
-
-// export function IssuesHistory({ crawls }) {
-//   const data = crawls
-//     .filter(
-//       (c) =>
-//         (c.CriticalIssues || 0) > 0 ||
-//         (c.AlertIssues || 0) > 0 ||
-//         (c.WarningIssues || 0) > 0
-//     )
-//     .map((c) => ({
-//       date: new Date(c.Start).toLocaleTimeString([], {
-//         hour: "2-digit",
-//         minute: "2-digit",
-//       }),
-//       critical: c.CriticalIssues || 0,
-//       alerts: c.AlertIssues || 0,
-//       warnings: c.WarningIssues || 0,
-//     }));
-//   return (
-//     <ResponsiveContainer width="100%" height={250}>
-//       <BarChart data={data}>
-//         <CartesianGrid strokeDasharray="3 3" />
-//         <XAxis dataKey="date" />
-//         <YAxis />
-//         <Tooltip />
-//         <Legend />
-//         <Bar dataKey="critical" stackId="a" fill="#FF4444" />
-//         <Bar dataKey="alerts" stackId="a" fill="#FFBB28" />
-//         <Bar dataKey="warnings" stackId="a" fill="#0088FE" />
-//       </BarChart>
-//     </ResponsiveContainer>
-//   );
-// }
-
-// export function IssueTypesPie({ crawl }) {
-//   const data = [
-//     { name: "Critical", value: crawl.CriticalIssues },
-//     { name: "Alerts", value: crawl.AlertIssues },
-//     { name: "Warnings", value: crawl.WarningIssues },
-//   ];
-
-//   return (
-//     <ResponsiveContainer width="100%" height={250}>
-//       <PieChart>
-//         <Pie data={data} dataKey="value" nameKey="name" outerRadius={90}>
-//           {data.map((_, i) => (
-//             <Cell key={i} fill={COLORS[i % COLORS.length]} />
-//           ))}
-//         </Pie>
-//         <Tooltip />
-//       </PieChart>
-//     </ResponsiveContainer>
-//   );
-// }
-
-// export function CanonicalPie({ canonical }) {
-//   const data = [
-//     { name: "Canonical", value: canonical.Canonical },
-//     { name: "Non Canonical", value: canonical.NonCanonical },
-//   ];
-//   return (
-//     <ResponsiveContainer width="100%" height={250}>
-//       <PieChart>
-//         <Pie data={data} dataKey="value" nameKey="name" outerRadius={90}>
-//           {data.map((_, i) => (
-//             <Cell key={i} fill={COLORS[i % COLORS.length]} />
-//           ))}
-//         </Pie>
-//         <Tooltip />
-//       </PieChart>
-//     </ResponsiveContainer>
-//   );
-// }
-
-// export function ImagesAltPie({ alt }) {
-//   const data = [
-//     { name: "With alt", value: alt.Alt },
-//     { name: "Without alt", value: alt.NonAlt },
-//   ];
-//   return (
-//     <ResponsiveContainer width="100%" height={250}>
-//       <PieChart>
-//         <Pie data={data} dataKey="value" nameKey="name" outerRadius={90}>
-//           {data.map((_, i) => (
-//             <Cell key={i} fill={COLORS[i % COLORS.length]} />
-//           ))}
-//         </Pie>
-//         <Tooltip />
-//       </PieChart>
-//     </ResponsiveContainer>
-//   );
-// }
-
-// export function StatusCodeByDepth({ statusDepth }) {
-//   const data = statusDepth.map((d) => ({
-//     depth: d.Depth,
-//     "2xx": d.StatusCode200,
-//     "3xx": d.StatusCode300,
-//     "4xx": d.StatusCode400,
-//     "5xx": d.StatusCode500,
-//   }));
-//   return (
-//     <ResponsiveContainer width="100%" height={300}>
-//       <BarChart data={data}>
-//         <CartesianGrid strokeDasharray="3 3" />
-//         <XAxis dataKey="depth" />
-//         <YAxis />
-//         <Tooltip />
-//         <Legend />
-//         <Bar dataKey="2xx" stackId="a" fill="#00C49F" />
-//         <Bar dataKey="3xx" stackId="a" fill="#FFBB28" />
-//         <Bar dataKey="4xx" stackId="a" fill="#FF8042" />
-//         <Bar dataKey="5xx" stackId="a" fill="#FF4444" />
-//       </BarChart>
-//     </ResponsiveContainer>
-//   );
-// }
-
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -244,6 +22,10 @@ import {
   Bug,
   Database,
   Link2,
+  LayoutDashboard,
+  BatteryWarning,
+  BadgeAlert,
+  Book,
 } from "lucide-react";
 
 export const ProjectDashboard = () => {
@@ -305,11 +87,11 @@ export const ProjectDashboard = () => {
         {/* Project Header */}
         <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="w-14 h-14 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
-              <Globe className="w-7 h-7 text-white" />
+            <div className="shrink-0 p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex items-center justify-center">
+              <Globe size={15} className="w-7 h-7 text-white" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white mb-1">
+            <div className="">
+              <h1 className="text-1xl font-bold text-white mb-1">
                 {Project.Host}
               </h1>
               <a
@@ -322,9 +104,37 @@ export const ProjectDashboard = () => {
                 <Link2 className="w-4 h-4 ml-2" />
               </a>
             </div>
+            <div className="text-[10px] h-10 sm:text-[14px] flex-col flex gap-2 sm:flex-row-reverse flex-1">
+              {/* Dashboard */}
+              <Link
+                to={"/dashboard"}
+                className="p-2  bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl flex gap-1 items-center justify-center cursor-pointer hover:opacity-90 transition"
+              >
+                <LayoutDashboard size={15} className="text-white" />
+                <span className="font-bold text-white">Dashboard</span>
+              </Link>
+
+              {/* Site Issues */}
+              <Link
+                to={`/crawl/${id}`}
+                className="p-2 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl flex gap-1 items-center justify-center cursor-pointer hover:opacity-90 transition"
+              >
+                <BadgeAlert size={15} className="text-white" />
+                <span className="font-bold text-white">Site Issues</span>
+              </Link>
+
+              {/* Page Details */}
+              <Link
+                to={`/pagedetails/${id}`}
+                className="p-2 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex gap-1 items-center justify-center cursor-pointer hover:opacity-90 transition"
+              >
+                <Book size={15} className="text-white" />
+                <span className="font-bold text-white">Page Details</span>
+              </Link>
+            </div>
           </div>
 
-          <div className="flex items-center text-gray-300 space-x-6">
+          <div className="text-[12px] sm:text-[16px] flex items-center text-gray-300 space-x-6">
             <span className="flex items-center">
               <Calendar className="w-4 h-4 mr-1" />
               {new Date(Project.Created).toLocaleDateString()}

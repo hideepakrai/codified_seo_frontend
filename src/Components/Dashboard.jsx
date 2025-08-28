@@ -135,7 +135,7 @@ export default function SEODashboard() {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid gap-6">
+        <div className="flex flex-col gap-6">
           {projects.map(({ Project, Crawl }, index) => (
             <div
               key={Project.Id}
@@ -150,8 +150,8 @@ export default function SEODashboard() {
                     <h3 className="text-xl font-semibold text-white mb-1">
                       Project {index + 1}
                     </h3>
-                    <p className="text-gray-300 flex items-center">
-                      {Project.URL}
+                    <p className="text-gray-300 flex items-center text-wrap">
+                      {Project.URL.split("").slice(8, 20).join("")}...
                       <ExternalLink className="w-4 h-4 ml-2" />
                     </p>
                   </div>
@@ -218,19 +218,25 @@ export default function SEODashboard() {
                     </div>
                   </Link>
 
-                  <div className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all">
+                  <Link
+                    to={`/export/${Project.Id}`}
+                    className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all"
+                  >
                     <Download className="w-6 h-6 text-blue-400" />
                     <div className="text-2xl font-bold text-blue-400">
                       Export
                     </div>
-                  </div>
+                  </Link>
 
-                  <div className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all">
+                  <Link
+                    to={`/pagedetails/${Project.Id}`}
+                    className="bg-black/20 rounded-xl p-4 flex items-center space-x-3 hover:bg-white/10 transition-all"
+                  >
                     <Database className="w-6 h-6 text-green-400" />
                     <div className="text-2xl font-bold text-green-400">
                       Page Details
                     </div>
-                  </div>
+                  </Link>
                 </div>
               )}
 

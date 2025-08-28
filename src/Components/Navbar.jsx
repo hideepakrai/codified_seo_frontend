@@ -1,98 +1,74 @@
-import { useState } from "react";
-
-import { Search, User, LogOut, Settings } from "lucide-react";
-import { Link } from "react-router";
+import { User, LogOut, Settings } from "lucide-react";
+import { Link, useLocation } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
 
 export const Navbar = () => {
   const { user: isLoggedIn, logout } = useAuth();
+  const location = useLocation();
 
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const linkClasses =
+    "relative text-gray-300 hover:text-white transition-all duration-300 group";
 
   return (
-    <nav className="relative z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-6 py-4">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r from-purple-900/80 via-black/80 to-pink-900/80 backdrop-blur-xl border-b border-purple-500/20 shadow-md shadow-purple-800/40">
+      <div className="max-w-7xl mx-auto px-6 py-3">
         <div className="flex items-center justify-between">
-          <Link to={"/"}>
-            <div className="flex items-center space-x-2">
-              <Search className="w-8 h-8 text-purple-400" />
-              <span className="text-2xl font-bold text-white">
-                Codified SEO
-              </span>
-            </div>
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3">
+            <img src="/logo.svg" alt="Logo" className="h-10" />
+            <span className="text-xl md:block hidden font-extrabold text-white tracking-wide">
+              Codified SEO
+            </span>
           </Link>
-          <div className="hidden md:flex items-center space-x-8">
-            {/* <a
-              href="#features"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Features
-            </a> */}
-            {/* <a
-              href="#pricing"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Pricing
-            </a>
-            <a
-              href="#contact"
-              className="text-gray-300 hover:text-white transition-colors"
-            >
-              Contact
-            </a> */}
 
+          {/* Right Section */}
+          <div className="flex items-center gap-1 sm:space-x-8">
             {!isLoggedIn ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to={"/signin"}
-                  className="text-gray-300 hover:text-white transition-colors "
-                >
-                  <button className="cursor-pointer">Login</button>
+              <>
+                <Link to="/signin" className={linkClasses}>
+                  Login
+                  <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
                 </Link>
 
                 <Link
-                  to={"/signup"}
-                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all transform hover:scale-105 "
+                  to="/signup"
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-pink-500/50 transition-transform transform hover:scale-105"
                 >
-                  <button className="cursor-pointer">Sign Up</button>
+                  Sign Up
                 </Link>
-              </div>
+              </>
             ) : (
-              <div className="relative">
-                <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center hover:from-purple-700 hover:to-pink-700 transition-all"
+              <>
+                <Link
+                  to="/dashboard"
+                  className={`${linkClasses} flex items-center space-x-2 ${
+                    location.pathname === "/dashboard" ? "text-white" : ""
+                  }`}
                 >
-                  <User className="w-5 h-5 text-white" />
-                </button>
+                  <User className="w-4 h-4" />
+                  <span>Dashboard</span>
+                  <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
 
-                {showProfileMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-black/90 backdrop-blur-xl rounded-lg border border-white/20 shadow-2xl">
-                    <div className="p-2">
-                      <Link
-                        to={"/dashboard"}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                      >
-                        <User className="w-4 h-4" />
-                        <span>Dashboard</span>
-                      </Link>
-                      <button className="w-full flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-                        <Settings className="w-4 h-4" />
-                        <span>Profile</span>
-                      </button>
-                      <hr className="border-white/20 my-2" />
-                      <button
-                        onClick={logout}
-                        className="w-full flex items-center space-x-3 px-3 py-2 text-gray-300 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Logout</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+                <Link
+                  to="/profile"
+                  className={`${linkClasses} flex items-center space-x-2 ${
+                    location.pathname === "/profile" ? "text-white" : ""
+                  }`}
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>Profile</span>
+                  <span className="absolute left-0 bottom-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full"></span>
+                </Link>
+
+                <button
+                  onClick={logout}
+                  className="flex items-center space-x-2 text-gray-300 hover:text-red-400 transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </>
             )}
           </div>
         </div>

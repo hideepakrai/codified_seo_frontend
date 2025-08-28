@@ -14,6 +14,8 @@ import CrawlSummary from "./Components/Issuepage";
 import IssueView from "./Components/IssueView";
 import IssueDetails from "./Components/Singleissue";
 import { ProjectDashboard } from "./Components/ProjectDashboard";
+import { Export } from "./Components/Export";
+import { SEOPageDetails } from "./Components/PageDetails";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +84,22 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoutes>
             <ProjectDashboard />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/export/:id",
+        element: (
+          <ProtectedRoutes>
+            <Export />
+          </ProtectedRoutes>
+        ),
+      },
+      {
+        path: "/pagedetails/:id",
+        element: (
+          <ProtectedRoutes>
+            <SEOPageDetails />
           </ProtectedRoutes>
         ),
       },

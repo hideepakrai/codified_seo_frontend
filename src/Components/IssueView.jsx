@@ -13,6 +13,7 @@ export default function IssueView() {
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
+  console.log(currentPage);
 
   const handleExportURL = async () => {
     try {
@@ -58,6 +59,8 @@ export default function IssueView() {
   useEffect(() => {
     const fetchAllIssues = async () => {
       try {
+        setLoading(true);
+        console.log("Fetching page:", currentPage);
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_URI

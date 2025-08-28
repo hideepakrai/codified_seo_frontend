@@ -469,12 +469,12 @@ export default function CrawlSummary() {
             </div>
 
             <div className="space-y-2 text-sm text-gray-300">
-              {safeRender(Project.UserAgent) && (
+              {/* {safeRender(Project.UserAgent) && (
                 <p>
                   <span className="font-semibold text-white">User Agent:</span>{" "}
-                  {Project.UserAgent}
+                  Mozilla/5.0 (compatible; CodifedBot/1.0)
                 </p>
-              )}
+              )} */}
               {safeRender(Project.Created) && (
                 <p>
                   <span className="font-semibold text-white">Created:</span>{" "}

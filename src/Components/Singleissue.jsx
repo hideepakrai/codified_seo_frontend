@@ -249,7 +249,7 @@ export default function IssueDetails() {
                     )}
                   </div>
                   <Link
-                    to={`/resources?pid=${pid}&rid=${inlink.PageReport.Id}&eid=${eid}&t=${selectedOption}`}
+                    to={`/resources?pid=${pid}&rid=${inlink.PageReport.Id}&eid=${eid}&t=details`}
                     className="flex items-center justify-center rounded-full bg-white text-black hover:bg-black hover:text-white w-10 h-10 transition"
                   >
                     <ArrowBigRightDash size={20} />
