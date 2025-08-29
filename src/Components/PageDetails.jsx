@@ -62,8 +62,11 @@ export const SEOPageDetails = () => {
     const fetchAllPages = async () => {
       setLoading(true);
       try {
+        const userId = localStorage.getItem("userid");
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URI}/explorer?pid=${id}&p=${currentPage}`,
+          `${
+            import.meta.env.VITE_API_URI
+          }/explorer?pid=${id}&p=${currentPage}&uid=${userId}`,
           {
             withCredentials: true,
           }
@@ -87,10 +90,11 @@ export const SEOPageDetails = () => {
     const getData = setTimeout(async () => {
       try {
         setLoading(true);
+        const userId = localStorage.getItem("userid");
         const response = await axios.get(
           `${
             import.meta.env.VITE_API_URI
-          }/explorer?p=1&pid=${id}&term=${searchQuery}`,
+          }/explorer?p=1&pid=${id}&term=${searchQuery}&uid=${userId}`,
           {
             withCredentials: true,
           }

@@ -38,8 +38,9 @@ export const ProjectDashboard = () => {
   useEffect(() => {
     const fetchAllProjects = async () => {
       try {
+        const userId = localStorage.getItem("userid");
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URI}/dashboard?pid=${id}`,
+          `${import.meta.env.VITE_API_URI}/dashboard?pid=${id}&uid=${userId}`,
           {
             withCredentials: true,
           }

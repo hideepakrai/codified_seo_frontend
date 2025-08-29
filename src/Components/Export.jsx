@@ -26,15 +26,19 @@ export const Export = () => {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
   const { id } = useParams();
-
+  const userId = localStorage.getItem("userid");
   const API_URI = import.meta.env.VITE_API_URI;
 
   useEffect(() => {
     const fetchAllExport = async () => {
       try {
-        const response = await axios.get(`${API_URI}/export?pid=${id}`, {
-          withCredentials: true,
-        });
+        const userId = localStorage.getItem("userid");
+        const response = await axios.get(
+          `${API_URI}/export?pid=${id}&uid=${userId}`,
+          {
+            withCredentials: true,
+          }
+        );
 
         if (response.data.ok) {
           setData(response.data);
@@ -58,7 +62,7 @@ export const Export = () => {
       icon: AlertCircle,
       color: "text-red-400",
       bgColor: "bg-red-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=issues`,
+      url: `${API_URI}/export/resources?pid=${id}&t=issues&uid=${userId}`,
     },
     {
       id: "sitemap",
@@ -68,7 +72,7 @@ export const Export = () => {
       icon: FileText,
       color: "text-blue-400",
       bgColor: "bg-blue-500/20",
-      url: `${API_URI}/export/sitemap?pid=${id}`,
+      url: `${API_URI}/export/sitemap?pid=${id}&uid=${userId}`,
     },
     {
       id: "csv",
@@ -78,7 +82,7 @@ export const Export = () => {
       icon: Database,
       color: "text-green-400",
       bgColor: "bg-green-500/20",
-      url: `${API_URI}/export/csv?pid=${id}`,
+      url: `${API_URI}/export/csv?pid=${id}&uid=${userId}`,
     },
     {
       id: "internal-links",
@@ -88,7 +92,7 @@ export const Export = () => {
       icon: Link,
       color: "text-purple-400",
       bgColor: "bg-purple-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=internal`,
+      url: `${API_URI}/export/resources?pid=${id}&t=internal&uid=${userId}`,
     },
     {
       id: "external-links",
@@ -98,7 +102,7 @@ export const Export = () => {
       icon: ExternalLink,
       color: "text-orange-400",
       bgColor: "bg-orange-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=external`,
+      url: `${API_URI}/export/resources?pid=${id}&t=external&uid=${userId}`,
     },
     {
       id: "images",
@@ -108,7 +112,7 @@ export const Export = () => {
       icon: Image,
       color: "text-pink-400",
       bgColor: "bg-pink-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=images`,
+      url: `${API_URI}/export/resources?pid=${id}&t=images&uid=${userId}`,
     },
     {
       id: "scripts",
@@ -118,7 +122,7 @@ export const Export = () => {
       icon: Code,
       color: "text-cyan-400",
       bgColor: "bg-cyan-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=scripts`,
+      url: `${API_URI}/export/resources?pid=${id}&t=scripts&uid=${userId}`,
     },
     {
       id: "styles",
@@ -128,7 +132,7 @@ export const Export = () => {
       icon: Palette,
       color: "text-yellow-400",
       bgColor: "bg-yellow-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=styles`,
+      url: `${API_URI}/export/resources?pid=${id}&t=styles&uid=${userId}`,
     },
     {
       id: "iframes",
@@ -138,7 +142,7 @@ export const Export = () => {
       icon: Square,
       color: "text-indigo-400",
       bgColor: "bg-indigo-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=iframes`,
+      url: `${API_URI}/export/resources?pid=${id}&t=iframes&uid=${userId}`,
     },
     {
       id: "audios",
@@ -148,7 +152,7 @@ export const Export = () => {
       icon: Headphones,
       color: "text-teal-400",
       bgColor: "bg-teal-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=audios`,
+      url: `${API_URI}/export/resources?pid=${id}&t=audios&uid=${userId}`,
     },
     {
       id: "videos",
@@ -158,7 +162,7 @@ export const Export = () => {
       icon: Video,
       color: "text-rose-400",
       bgColor: "bg-rose-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=videos`,
+      url: `${API_URI}/export/resources?pid=${id}&t=videos&uid=${userId}`,
     },
     {
       id: "hreflangs",
@@ -168,9 +172,11 @@ export const Export = () => {
       icon: Globe,
       color: "text-emerald-400",
       bgColor: "bg-emerald-500/20",
-      url: `${API_URI}/export/resources?pid=${id}&t=hreflangs`,
+      url: `${API_URI}/export/resources?pid=${id}&t=hreflangs&uid=${userId}`,
     },
   ];
+
+  console.log(exportOptions);
 
   const handleExport = async (exportId, exportURL) => {
     console.log(exportURL);

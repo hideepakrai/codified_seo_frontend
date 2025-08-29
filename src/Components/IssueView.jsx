@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { ArrowBigLeft, Download, ExternalLink } from "lucide-react";
+import { issueDescriptions, issueKeys } from "../assets/Helper";
 
 export default function IssueView() {
   const [searchParams] = useSearchParams();
@@ -13,7 +14,6 @@ export default function IssueView() {
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
-  console.log(currentPage);
 
   const handleExportURL = async () => {
     try {
@@ -60,11 +60,11 @@ export default function IssueView() {
     const fetchAllIssues = async () => {
       try {
         setLoading(true);
-        console.log("Fetching page:", currentPage);
+        const userId = localStorage.getItem("userid");
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_URI
-          }/issues/view?pid=${pid}&eid=${eid}&page=${currentPage}`,
+          }/issues/view?pid=${pid}&eid=${eid}&page=${currentPage}&uid=${userId}`,
           { withCredentials: true }
         );
         if (res.data.ok) {
@@ -82,21 +82,6 @@ export default function IssueView() {
   }, [pid, eid, currentPage]);
 
   const t = "details";
-
-  const status = "timeout";
-
-  const getStatusText = () => {
-    switch (status) {
-      case "timeout":
-        return "Request Timed Out";
-      case "error":
-        return "Download Failed";
-      case "success":
-        return "Ready to Download";
-      default:
-        return "Processing";
-    }
-  };
 
   if (loading) {
     return (
@@ -134,7 +119,7 @@ export default function IssueView() {
             >
               <ArrowBigLeft />
             </button>
-            <h2 className="text-2xl font-bold text-white">{getStatusText()}</h2>
+            <h2 className="text-2xl font-bold text-white">{issueKeys[eid]}</h2>
           </div>
           <button
             onClick={handleExportURL}

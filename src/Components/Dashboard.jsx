@@ -21,42 +21,98 @@ import {
   Clock,
   AlertCircle,
   Database,
+  ChevronDown,
 } from "lucide-react";
 import axios from "axios";
 import { Link } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 export default function SEODashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [projects, setProjects] = useState([]);
+  const { user } = useAuth();
+  const [allUsers, setAllUsers] = useState(null);
+  const [selectedValue, setSelectValue] = useState("Normal");
+
+  const [viewother, setViewOther] = useState(false);
 
   useEffect(() => {
-    const fetchAllProjects = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URI}`, {
+    if (!viewother) {
+      (async () => {
+        setLoading(true);
+        try {
+          const response = await axios.get(`${import.meta.env.VITE_API_URI}`, {
+            withCredentials: true,
+          });
+
+          if (response.data.ok) {
+            const sortedByCreated = response.data.projects.sort(
+              (a, b) =>
+                new Date(b.Project.Created).getTime() -
+                new Date(a.Project.Created).getTime()
+            );
+
+            setProjects(sortedByCreated);
+          }
+        } catch (error) {
+          // projets
+          setProjects([]);
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+  }, [viewother]);
+
+  useEffect(() => {
+    if (user.user.Email == "admin@codified.com") {
+      (async () => {
+        const ri = await axios.get(`${import.meta.env.VITE_API_URI}/userall`, {
           withCredentials: true,
         });
+        setAllUsers(ri.data);
+      })();
+    }
+  }, [user]);
 
-        if (response.data.ok) {
-          const sortedByCreated = response.data.projects.sort(
-            (a, b) =>
-              new Date(b.Project.Created).getTime() -
-              new Date(a.Project.Created).getTime()
-          );
+  useEffect(() => {
+    localStorage.removeItem("userid");
+  }, []);
 
-          setProjects(sortedByCreated);
-        }
-      } catch (error) {
-        // projets
-        setProjects([]);
-        setError(error.message);
-      } finally {
-        setLoading(false);
+  const handleSelectUser = async (id) => {
+    try {
+      setSelectValue(id);
+      setViewOther(true);
+      if (id == "Normal") {
+        setViewOther(false);
+        localStorage.removeItem("userid");
+        return;
       }
-    };
-    fetchAllProjects();
-  }, [projects]);
+      setLoading(true);
+      localStorage.setItem("userid", id);
+      const user = allUsers.user.find((d) => d.Id == id);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URI}/user/project?email=${user.Email}`,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data.ok) {
+        setProjects(
+          response.data.projects != null ? response.data.projects : []
+        );
+        setError(null);
+      }
+    } catch (error) {
+      setError(error.message);
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDeleteProjects = async (id) => {
     try {
@@ -93,6 +149,7 @@ export default function SEODashboard() {
       {/* Top Navigation */}
 
       {/* Main Content */}
+
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header Section */}
         <div className="mb-8">
@@ -117,10 +174,28 @@ export default function SEODashboard() {
           </div>
 
           {/* Filter Button */}
-          <button className="flex items-center space-x-2 px-4 py-3 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl text-gray-300 hover:text-white hover:bg-white/20 transition-all">
-            <Filter className="w-5 h-5" />
-            <span>Filter</span>
-          </button>
+          {allUsers != null && (
+            <div className="relative w-64">
+              <select
+                value={selectedValue}
+                onChange={(e) => handleSelectUser(e.target.value)}
+                className="w-full appearance-none rounded-xl bg-white/10 backdrop-blur-xl 
+                   border border-white/20 py-3 pl-4 pr-10 text-white
+                   focus:outline-none focus:bg-black/20 focus:ring-2 focus:ring-purple-500 focus:border-transparent
+                   transition-all cursor-pointer"
+              >
+                <option value="Normal">Select a project...</option>
+                {allUsers.user.map((d) => (
+                  <option key={d.Id} value={d.Id}>
+                    {d.Name ? d.Name : d.Email}
+                  </option>
+                ))}
+              </select>
+
+              {/* Custom dropdown arrow */}
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+            </div>
+          )}
 
           {/* Add New Project Button */}
           <Link
@@ -301,7 +376,6 @@ export default function SEODashboard() {
           ))}
         </div>
 
-        {/* Empty State */}
         {projects.length === 0 && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
