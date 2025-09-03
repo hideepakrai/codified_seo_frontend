@@ -226,7 +226,7 @@ export default function SEODashboard() {
                       Project {index + 1}
                     </h3>
                     <p className="text-gray-300 flex items-center text-wrap">
-                      {Project.URL.split("").slice(8, 20).join("")}...
+                      {Project.URL.substr(0, 40)}
                       <ExternalLink className="w-4 h-4 ml-2" />
                     </p>
                   </div>
@@ -252,17 +252,19 @@ export default function SEODashboard() {
 
                   {Crawl.Crawling && (
                     <Link
-                      to={`/crawl?pid=${Project.Id}&Crawling=${Crawl.Crawling}`}
-                      className="inline-flex items-center px-5 py-1  rounded-xl bg-green-700 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      to={`/crawl?pid=${Project.Id}&Crawling=${Crawl.Crawling}&crawlid=${Crawl.Id}`}
+                      className={`inline-flex items-center px-5 py-1  rounded-xl  text-white font-medium shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 ${
+                        Crawl.Id == 0 ? "bg-green-600" : "bg-orange-400"
+                      }`}
                     >
-                      Crawling
+                      {Crawl.Id == 0 ? "Crawl First" : "Crawling"}
                     </Link>
                   )}
 
                   {!Crawl.Crawling && (
                     <Link
-                      to={`/crawl?pid=${Project.Id}&Crawling=${Crawl.Crawling}`}
-                      className="inline-flex items-center px-5 py-1  rounded-xl bg-blue-700 text-white font-medium shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300"
+                      to={`/crawl?pid=${Project.Id}&Crawling=${Crawl.Crawling}&crawlid=${Crawl.Id}`}
+                      className={`inline-flex items-center px-5 py-1  rounded-xl text-white font-medium shadow-md hover:shadow-lg hover:scale-105 transition-all duration-300 bg-blue-600`}
                     >
                       Crawl Now
                     </Link>

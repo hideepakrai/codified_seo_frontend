@@ -61,9 +61,21 @@ export default function AddProjectForm() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
+
       const projectData = {
-        ...formData,
-        basicAuthCredentials: formData.basicAuth ? basicAuthData : null,
+        url: formData.url,
+        ignore_robotstxt: formData.ignoreRobotsTxt,
+        follow_nofollow: formData.followNofollow,
+        include_noindex: formData.includeNoindex,
+        crawl_sitemap: formData.crawlSitemap,
+        allow_subdomains: formData.allowSubdomains,
+        basic_auth: formData.basicAuth,
+        check_external_links: formData.checkExternalLinks,
+        archive: formData.archive,
+        custom_user_agent: formData.customUserAgent,
+        custom_user_agent_text: formData.customUserAgent
+          ? formData.customUserAgentText
+          : "",
       };
 
       const response = await axios.post(
@@ -77,7 +89,6 @@ export default function AddProjectForm() {
         }
       );
 
-      console.log(response);
       if (response.data.message == "Project created") {
         navigate("/dashboard");
       }
