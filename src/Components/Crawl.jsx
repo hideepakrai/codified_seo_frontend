@@ -71,7 +71,7 @@ export default function CrawlComponent() {
     try {
       setCrawlStatus("starting");
       let response = null;
-      if (crawling && crawlid == 0) {
+      if ((crawling && crawlid == 0) || (!crawling && crawlid !== 0)) {
         response = await axios.get(
           `${import.meta.env.VITE_API_URI}/crawl/start?pid=${id}`,
           { withCredentials: true }
@@ -110,10 +110,10 @@ export default function CrawlComponent() {
   useEffect(() => {
     if (!wsurl) return;
 
-    const ws = new WebSocket(wsurl);
-    wsRef.current = ws;
+    const wes = new WebSocket(wsurl);
+    wsRef.current = wes;
 
-    ws.onopen = () => {
+    wes.onopen = () => {
       console.log("✅ WebSocket connected:", wsurl);
       setCrawlStatus("running");
       setLogs((prev) => [
@@ -126,7 +126,7 @@ export default function CrawlComponent() {
       ]);
     };
 
-    ws.onmessage = (event) => {
+    wes.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         console.log("📨 WS Message:", data);
@@ -159,7 +159,7 @@ export default function CrawlComponent() {
       }
     };
 
-    ws.onerror = (err) => {
+    wes.onerror = (err) => {
       console.error("❌ WebSocket error:", err);
       setLogs((prev) => [
         { type: "error", message: "WebSocket error", timestamp: new Date() },
@@ -167,7 +167,7 @@ export default function CrawlComponent() {
       ]);
     };
 
-    ws.onclose = () => {
+    wes.onclose = () => {
       console.log("🔌 WebSocket closed");
       setLogs((prev) => [
         {
@@ -181,8 +181,8 @@ export default function CrawlComponent() {
     };
 
     return () => {
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close();
+      if (wes && wes.readyState === WebSocket.OPEN) {
+        wes.close();
       }
     };
   }, [wsurl]);
