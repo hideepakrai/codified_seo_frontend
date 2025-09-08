@@ -6,75 +6,43 @@ import {
   Globe,
   Calendar,
   Activity,
-  MoreVertical,
-  Filter,
   Eye,
   Download,
   Trash2,
-  User,
-  Bell,
-  Settings,
-  LogOut,
   ExternalLink,
   CheckCircle,
-  XCircle,
-  Clock,
   AlertCircle,
   Database,
   ChevronDown,
 } from "lucide-react";
-import axios from "axios";
 import { Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteProject,
+  fetchAllUsersIfAdmin,
+  fetchProjects,
+  userSelect,
+} from "../redux/slices/projectSlice";
 
 export default function SEODashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [projects, setProjects] = useState([]);
   const { user } = useAuth();
-  const [allUsers, setAllUsers] = useState(null);
-  const [selectedValue, setSelectValue] = useState("Normal");
+  const { projects, loading, viewother, selectedValue, allUsers } = useSelector(
+    (state) => state.projects
+  );
 
-  const [viewother, setViewOther] = useState(false);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!viewother) {
-      (async () => {
-        setLoading(true);
-        try {
-          const response = await axios.get(`${import.meta.env.VITE_API_URI}`, {
-            withCredentials: true,
-          });
-
-          if (response.data.ok) {
-            const sortedByCreated = response.data.projects.sort(
-              (a, b) =>
-                new Date(b.Project.Created).getTime() -
-                new Date(a.Project.Created).getTime()
-            );
-
-            setProjects(sortedByCreated);
-          }
-        } catch (error) {
-          // projets
-          setProjects([]);
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      })();
+    if (!viewother && projects.length == 0) {
+      dispatch(fetchProjects());
     }
   }, [viewother]);
 
   useEffect(() => {
     if (user.user.Email == "admin@codified.com") {
-      (async () => {
-        const ri = await axios.get(`${import.meta.env.VITE_API_URI}/userall`, {
-          withCredentials: true,
-        });
-        setAllUsers(ri.data);
-      })();
+      dispatch(fetchAllUsersIfAdmin());
     }
   }, [user]);
 
@@ -82,57 +50,12 @@ export default function SEODashboard() {
     localStorage.removeItem("userid");
   }, []);
 
-  const handleSelectUser = async (id) => {
-    try {
-      setSelectValue(id);
-      setViewOther(true);
-      if (id == "Normal") {
-        setViewOther(false);
-        localStorage.removeItem("userid");
-        return;
-      }
-      setLoading(true);
-      localStorage.setItem("userid", id);
-      const user = allUsers.user.find((d) => d.Id == id);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URI}/user/project?email=${user.Email}`,
-        {
-          withCredentials: true,
-        }
-      );
-      if (response.data.ok) {
-        setProjects(
-          response.data.projects != null ? response.data.projects : []
-        );
-        setError(null);
-      }
-    } catch (error) {
-      setError(error.message);
-      setProjects([]);
-    } finally {
-      setLoading(false);
-    }
+  const handleSelectUser = (id) => {
+    dispatch(userSelect(id));
   };
 
-  const handleDeleteProjects = async (id) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URI}/project/delete?pid=${id}`,
-        {
-          withCredentials: true,
-        }
-      );
-
-      if (response.data.ok) {
-        const copied = [...projects];
-        const final = copied.filter(({ Project }) => Project.Id !== id);
-        setProjects(final);
-      } else {
-        throw error;
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  const handleDeleteProjects = (id) => {
+    dispatch(deleteProject(id));
   };
 
   if (loading) {
@@ -184,7 +107,7 @@ export default function SEODashboard() {
                    focus:outline-none focus:bg-black/20 focus:ring-2 focus:ring-purple-500 focus:border-transparent
                    transition-all cursor-pointer"
               >
-                <option value="Normal">Select a project...</option>
+                <option value="Normal">Select a User...</option>
                 {allUsers.user.map((d) => (
                   <option key={d.Id} value={d.Id}>
                     {d.Name ? d.Name : d.Email}
@@ -234,14 +157,14 @@ export default function SEODashboard() {
 
                 <div className="flex items-center space-x-2">
                   <div
-                    className={`px-3 py-1 rounded-full flex items-center space-x-2 ${
+                    className={` px-3 py-1 rounded-full flex items-center space-x-2 ${
                       Project.Deleting
                         ? "bg-red-500/20 text-red-400"
                         : "bg-green-500/20 text-green-400"
                     }`}
                   >
                     {Project.Deleting ? (
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 " />
                     ) : (
                       <CheckCircle className="w-4 h-4" />
                     )}
@@ -367,7 +290,8 @@ export default function SEODashboard() {
                     </button>
                     <button
                       onClick={() => handleDeleteProjects(Project.Id)}
-                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all
+                      cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

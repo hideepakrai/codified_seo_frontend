@@ -13,13 +13,19 @@ import {
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { issueDescriptions, issues } from "../assets/Helper";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllIssues } from "../redux/slices/issuePageSlice";
 
 export default function CrawlSummary() {
-  const [Project, setProject] = useState({});
-  const [Crawl, setCrawl] = useState({});
-  const [Issues, setIssues] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [Project, setProject] = useState({});
+  // const [Crawl, setCrawl] = useState({});
+  // const [Issues, setIssues] = useState({});
+  // const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(true);
+  const { Project, Crawl, Issues, error, loading } = useSelector(
+    (state) => state.issues
+  );
+  const dispatch = useDispatch();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -53,28 +59,10 @@ export default function CrawlSummary() {
     }
   };
 
+  console.log(error, Project, loading, Crawl, Issues);
+
   useEffect(() => {
-    const fetchAllIssues = async (id) => {
-      try {
-        const userId = localStorage.getItem("userid");
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URI}/issues?pid=${id}&uid=${userId}`,
-          { withCredentials: true }
-        );
-        if (response.data.ok) {
-          setProject(response.data.data.ProjectView.Project);
-          setCrawl(response.data.data.ProjectView.Crawl);
-          setIssues(response.data.data.IssueCount);
-        }
-      } catch (error) {
-        setProject({});
-        setCrawl({});
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAllIssues(id);
+    dispatch(fetchAllIssues(id));
   }, [id]);
 
   const totalIssues =
@@ -306,65 +294,66 @@ export default function CrawlSummary() {
         {/* Issues List Section */}
         <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 p-6">
           <h2 className="text-xl font-semibold text-white mb-4">Issues</h2>
-          {Object.keys(Issues).map(
-            (group) =>
-              Issues[group]?.length > 0 && (
-                <div key={group} className="mb-6">
-                  {/* Toggle Group */}
-                  <button
-                    onClick={() =>
-                      setExpandGroups((prev) => ({
-                        ...prev,
-                        [group]: !prev[group],
-                      }))
-                    }
-                    className="w-full flex justify-between items-center px-3 py-2 bg-black/30 rounded-lg border border-white/10 hover:bg-black/40 transition-all"
-                  >
-                    <span className="text-purple-300 font-semibold flex items-center gap-2">
-                      {expandGroups[group] ? (
-                        <ChevronDown size={18} />
-                      ) : (
-                        <ChevronRight size={18} />
-                      )}
-                      {issues[group]}
-                    </span>
-                    <span className="text-sm text-gray-400 bg-purple-500/20 px-2 py-1 rounded-md">
-                      {Issues[group].length}
-                    </span>
-                  </button>
+          {Issues &&
+            Object.keys(Issues).map(
+              (group) =>
+                Issues[group]?.length > 0 && (
+                  <div key={group} className="mb-6">
+                    {/* Toggle Group */}
+                    <button
+                      onClick={() =>
+                        setExpandGroups((prev) => ({
+                          ...prev,
+                          [group]: !prev[group],
+                        }))
+                      }
+                      className="w-full flex justify-between items-center px-3 py-2 bg-black/30 rounded-lg border border-white/10 hover:bg-black/40 transition-all"
+                    >
+                      <span className="text-purple-300 font-semibold flex items-center gap-2">
+                        {expandGroups[group] ? (
+                          <ChevronDown size={18} />
+                        ) : (
+                          <ChevronRight size={18} />
+                        )}
+                        {issues[group]}
+                      </span>
+                      <span className="text-sm text-gray-400 bg-purple-500/20 px-2 py-1 rounded-md">
+                        {Issues[group].length}
+                      </span>
+                    </button>
 
-                  {/* Expandable Items */}
-                  <div
-                    className={`transition-all duration-300 overflow-hidden ${
-                      expandGroups[group] ? "max-h-[1000px] mt-2" : "max-h-0"
-                    }`}
-                  >
-                    <ul className="space-y-2">
-                      {Issues[group].map((item, idx) => (
-                        <li
-                          key={idx}
-                          className="flex justify-between items-start bg-black/20 p-3 rounded-lg border border-white/10 hover:bg-black/30 transition-colors"
-                        >
-                          <div className="flex flex-col">
-                            {issueDescriptions[item.ErrorType] && (
-                              <span className="text-gray-200 text-sm font-medium">
-                                {issueDescriptions[item.ErrorType]}
-                              </span>
-                            )}
-                          </div>
-                          <Link
-                            className="px-3 py-1 text-xs font-medium rounded-lg bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 hover:text-white transition-colors"
-                            to={`/issues/view?pid=${Project.Id}&eid=${item.ErrorType}`}
+                    {/* Expandable Items */}
+                    <div
+                      className={`transition-all duration-300 overflow-hidden ${
+                        expandGroups[group] ? "max-h-[1000px] mt-2" : "max-h-0"
+                      }`}
+                    >
+                      <ul className="space-y-2">
+                        {Issues[group].map((item, idx) => (
+                          <li
+                            key={idx}
+                            className="flex justify-between items-start bg-black/20 p-3 rounded-lg border border-white/10 hover:bg-black/30 transition-colors"
                           >
-                            <p>{item.Count} pages</p>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
+                            <div className="flex flex-col">
+                              {issueDescriptions[item.ErrorType] && (
+                                <span className="text-gray-200 text-sm font-medium">
+                                  {issueDescriptions[item.ErrorType]}
+                                </span>
+                              )}
+                            </div>
+                            <Link
+                              className="px-3 py-1 text-xs font-medium rounded-lg bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 hover:text-white transition-colors"
+                              to={`/issues/view?pid=${Project.Id}&eid=${item.ErrorType}`}
+                            >
+                              <p>{item.Count} pages</p>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                </div>
-              )
-          )}
+                )
+            )}
         </div>
       </div>
     </div>

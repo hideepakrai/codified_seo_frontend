@@ -1,5 +1,4 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useParams } from "react-router";
 import {
   BarChart,
@@ -23,42 +22,20 @@ import {
   Database,
   Link2,
   LayoutDashboard,
-  BatteryWarning,
   BadgeAlert,
   Book,
 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllProjects } from "../redux/slices/projectDashboardSlice";
 
 export const ProjectDashboard = () => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
   const { id } = useParams();
-  const [projectView, setProjectView] = useState(null);
-
+  const { data, projectView, loading, error } = useSelector(
+    (state) => state.dashboard
+  );
+  const dispatch = useDispatch();
   useEffect(() => {
-    const fetchAllProjects = async () => {
-      try {
-        const userId = localStorage.getItem("userid");
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URI}/dashboard?pid=${id}&uid=${userId}`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        if (response.data.ok) {
-          setData(response.data.data);
-          setProjectView(response.data.data.project_view);
-        }
-      } catch (error) {
-        setData(null);
-        setProjectView(null);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAllProjects();
+    dispatch(fetchAllProjects(id));
   }, [id]);
 
   if (loading) {

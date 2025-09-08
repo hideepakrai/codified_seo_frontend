@@ -16,6 +16,8 @@ import IssueDetails from "./Components/Singleissue";
 import { ProjectDashboard } from "./Components/ProjectDashboard";
 import { Export } from "./Components/Export";
 import { SEOPageDetails } from "./Components/PageDetails";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
 const router = createBrowserRouter([
   {
@@ -110,7 +112,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </AuthProvider>
   </StrictMode>
 );

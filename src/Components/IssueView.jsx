@@ -3,17 +3,22 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { ArrowBigLeft, Download, ExternalLink } from "lucide-react";
 import { issueDescriptions, issueKeys } from "../assets/Helper";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchIssueView,
+  handleNextPage,
+  handlePrevPage,
+} from "../redux/slices/issueViewSlice";
 
 export default function IssueView() {
   const [searchParams] = useSearchParams();
   const pid = searchParams.get("pid");
   const eid = searchParams.get("eid");
   const navigate = useNavigate();
-  const [data, setData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const [currentPage, setCurrentPage] = useState(1);
+  const { data, error, loading, currentPage } = useSelector(
+    (state) => state.issueview
+  );
+  const dispatch = useDispatch();
 
   const handleExportURL = async () => {
     try {
@@ -26,13 +31,6 @@ export default function IssueView() {
           responseType: "blob", // so we can download the file
         }
       );
-      // const res = await axios.get(
-      //   `${import.meta.env.VITE_API_URI}/export/resources?pid=${pid}&t=issues`,
-      //   {
-      //     withCredentials: true,
-      //     responseType: "blob", // so we can download the file
-      //   }
-      // );
 
       // trigger file download
       const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -57,28 +55,7 @@ export default function IssueView() {
   };
 
   useEffect(() => {
-    const fetchAllIssues = async () => {
-      try {
-        setLoading(true);
-        const userId = localStorage.getItem("userid");
-        const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_URI
-          }/issues/view?pid=${pid}&eid=${eid}&page=${currentPage}&uid=${userId}`,
-          { withCredentials: true }
-        );
-        if (res.data.ok) {
-          setData(res.data.data);
-        }
-      } catch (error) {
-        setData({});
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAllIssues();
+    dispatch(fetchIssueView({ pid, eid }));
   }, [pid, eid, currentPage]);
 
   const t = "details";
@@ -101,6 +78,8 @@ export default function IssueView() {
       </div>
     );
   }
+
+  console.log(currentPage);
 
   const pageReports = data?.PaginatorView?.PageReports || [];
   const totalPages = data?.PaginatorView?.Paginator?.TotalPages || 1;
@@ -161,14 +140,13 @@ export default function IssueView() {
         <div className="flex justify-center items-center space-x-3 mt-6">
           <button
             onClick={() => {
-              setCurrentPage((p) => Math.max(p - 1, 1));
-              setLoading(true);
+              dispatch(handlePrevPage());
             }}
             disabled={currentPage === 1}
             className={`px-4 py-1 rounded-lg text-sm font-medium ${
               currentPage === 1
                 ? "bg-gray-700/50 text-gray-400 cursor-not-allowed"
-                : "bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 hover:text-white"
+                : "bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 hover:text-white cursor-pointer"
             }`}
           >
             Prev
@@ -180,14 +158,13 @@ export default function IssueView() {
 
           <button
             onClick={() => {
-              setCurrentPage((p) => Math.min(p + 1, totalPages));
-              setLoading(true);
+              dispatch(handleNextPage(totalPages));
             }}
             disabled={currentPage === totalPages}
             className={`px-4 py-1 rounded-lg text-sm font-medium ${
               currentPage === totalPages
                 ? "bg-gray-700/50 text-gray-400 cursor-not-allowed"
-                : "bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 hover:text-white"
+                : "bg-purple-600/20 text-purple-300 border border-purple-500/30 hover:bg-purple-600/30 hover:text-white cursor-pointer"
             }`}
           >
             Next
